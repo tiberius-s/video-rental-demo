@@ -1,0 +1,46 @@
+{
+  "name": "@video-rental/domain",
+  "version": "0.1.0",
+  "type": "module",
+  "author": "Tiberius Silivestru <tiberius.silivestru@gmail.com>",
+  "license": "MIT",
+  "main": "dist/src/index.js",
+  "private": true,
+  "tspMain": "lib/main.tsp",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./testing": {
+      "types": "./dist/src/testing/index.d.ts",
+      "default": "./dist/src/testing/index.js"
+    }
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^1.0.0",
+    "@typespec/library-linter": "^0.70.0",
+    "@typespec/http": "^1.0.1",
+    "@typespec/openapi": "^1.0.0",
+    "@typespec/openapi3": "^1.0.0",
+    "@typespec/prettier-plugin-typespec": "^1.0.0",
+    "@typespec/rest": "^0.70.0"
+  },
+  "scripts": {
+    "build": "tsc && npm run build:tsp",
+    "build:tsp": "tsp compile . --warn-as-error --import @typespec/library-linter",
+    "tsp:compile": "tsp compile .",
+    "tsp:watch": "tsp compile . --watch",
+    "tsp:format": "tsp format lib/**/*.tsp",
+    "tsp:validate": "tsp compile . --no-emit",
+    "clean": "rm -rf dist tsp-output *.tsbuildinfo",
+    "test": "node --test --import=tsx test/",
+    "lint": "eslint src/ test/ --report-unused-disable-directives --max-warnings=0",
+    "lint:fix": "eslint src/ test/ --report-unused-disable-directives --fix",
+    "lint:oas": "npx @redocly/cli@latest lint tsp-output/@typespec/openapi3/openapi.json",
+    "format": "prettier \"src/**/*.ts\" \"test/**/*.ts\" \"lib/**/*.tsp\" --write",
+    "format:check": "prettier \"src/**/*.ts\" \"test/**/*.ts\" \"lib/**/*.tsp\" --check",
+    "docs:generate": "npm run build:tsp && echo 'OpenAPI spec generated in tsp-output/@typespec/openapi3/openapi.json'",
+    "dev": "npm run tsp:watch"
+  }
+}

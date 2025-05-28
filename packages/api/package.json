@@ -1,0 +1,26 @@
+{
+  "name": "@video-rental/api",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "Tiberius Silivestru <tiberius.silivestru@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "lint": "eslint src/ test/ --report-unused-disable-directives --max-warnings=0",
+    "lint:fix": "eslint src/ test/ --report-unused-disable-directives --fix",
+    "format": "prettier \"src/**/*.ts\" \"test/**/*.ts\" --write",
+    "format:check": "prettier \"src/**/*.ts\" \"test/**/*.ts\" --check",
+    "test": "node --test --import=tsx test/"
+  },
+  "dependencies": {
+    "@video-rental/domain": "^0.1.0",
+    "express": "^5.0.1",
+    "pino": "^9.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0"
+  }
+}

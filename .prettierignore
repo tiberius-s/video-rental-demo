@@ -1,0 +1,20 @@
+# Build artifacts
+**/dist/**
+**/node_modules/**
+**/coverage/**
+**/tsp-output/**
+
+# Compiled files
+**/*.d.ts
+**/*.js.map
+**/*.ts.map
+
+# Ignore compiled JS files that have corresponding TS files
+packages/**/src/**/*.js
+packages/**/test/**/*.js
+
+# TypeSpec files (handled by TypeSpec prettier plugin)
+**/*.tsp
+
+# Generated files
+*.tsbuildinfo

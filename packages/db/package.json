@@ -1,0 +1,35 @@
+{
+  "name": "@video-rental/db",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "Tiberius Silivestru <tiberius.silivestru@gmail.com>",
+  "license": "MIT",
+  "description": "",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "lint": "eslint src/ --report-unused-disable-directives --max-warnings=0",
+    "lint:fix": "eslint src/ --report-unused-disable-directives --fix",
+    "format": "prettier \"src/**/*.ts\" --write",
+    "format:check": "prettier \"src/**/*.ts\" --check",
+    "test": "node --test --import=tsx src/**/*.test.ts",
+    "test:watch": "node --test --watch --import=tsx src/**/*.test.ts",
+    "test:coverage": "node --test --experimental-test-coverage --import=tsx src/**/*.test.ts",
+    "dev": "npm run build -- --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "better-sqlite3": "11.10.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13"
+  }
+}

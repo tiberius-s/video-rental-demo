@@ -1,0 +1,12 @@
+extends:
+  - recommended
+
+rules:
+  # Allow localhost for development
+  no-server-example.com: off
+
+  # Skip unused components warning for base models
+  no-unused-components: off
+
+  # Keep other important validations
+  operation-4xx-response: warn
