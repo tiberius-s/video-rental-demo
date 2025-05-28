@@ -9,6 +9,7 @@ using VideoRental.Domain.ValueObjects;
 model Rental {
   @key("rentalId")
   @format("uuid")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @doc("The unique ID of the rental")
   id: string;
 

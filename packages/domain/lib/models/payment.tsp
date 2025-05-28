@@ -8,6 +8,7 @@ using VideoRental.Domain.ValueObjects;
 model Payment {
   @key("paymentId")
   @format("uuid")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @doc("The unique ID of the payment")
   id: string;
 

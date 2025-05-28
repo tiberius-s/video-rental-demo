@@ -10,7 +10,7 @@ Detailed Domain-Driven Design implementation documentation covering:
 
 - **Domain Structure**: Value objects, domain models, and services
 - **Business Rules**: Customer management, rental logic, inventory tracking
-- **API Overview**: 25 endpoints across 7 functional areas
+- **API Overview**: 32 operations across 21 endpoints covering complete CRUD operations
 - **Technical Implementation**: TypeSpec-based development approach
 - **Architectural Benefits**: Separation of concerns and type safety
 
@@ -42,7 +42,7 @@ Entity Relationship documentation describing:
 - Domain services, models, and value objects
 - Business rules implementation
 - Technical benefits and features
-- 25 API endpoints organized by functional area
+- 32 API operations organized by functional area
 
 ## 🔧 How to View Diagrams
 
@@ -60,21 +60,21 @@ Entity Relationship documentation describing:
 
 ## 📊 Current Domain Stats
 
-- **Total Endpoints**: 25 across 7 functional areas
+- **Total Operations**: 32 across 21 endpoints in 7 functional areas
 - **Domain Models**: 8 core entities + shared PersonBase pattern
-- **Value Objects**: 6 immutable business concepts
-- **Domain Services**: 3 business logic services
+- **Value Objects**: 5 immutable business concepts
+- **Domain Services**: 2 business logic services
 - **Business Rules**: Comprehensive coverage of rental operations
 
 ## 🎯 Functional Areas
 
-1. **System** (2 endpoints) - Health monitoring and documentation
-2. **Videos** (5 endpoints) - Catalog management and availability
-3. **Customers** (5 endpoints) - Registration and eligibility management
-4. **Rentals** (4 endpoints) - Core rental workflow operations
-5. **Payments** (3 endpoints) - Financial transaction processing
-6. **Employees** (4 endpoints) - Staff management and roles
-7. **Inventory** (2 endpoints) - Physical copy tracking
+1. **System** (2 operations) - Health monitoring and documentation
+2. **Videos** (6 operations) - Complete catalog management with CRUD operations
+3. **Customers** (7 operations) - Full customer lifecycle management
+4. **Rentals** (5 operations) - Core rental workflow operations with cancellation
+5. **Payments** (3 operations) - Financial transaction processing
+6. **Employees** (5 operations) - Complete staff management with CRUD operations
+7. **Inventory** (4 operations) - Physical copy lifecycle management
 
 ## 🏗️ Architecture Highlights
 

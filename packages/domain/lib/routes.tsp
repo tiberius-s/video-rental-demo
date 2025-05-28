@@ -171,6 +171,20 @@ namespace Videos {
     @statusCode statusCode: 404;
     @body body: ErrorResponse;
   };
+
+  @delete
+  @tag("Videos")
+  @summary("Remove video from catalog")
+  @doc("Soft delete - marks video as inactive, prevents new rentals")
+  op remove(@path videoId: string): {
+    @statusCode statusCode: 204;
+  } | {
+    @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  } | {
+    @statusCode statusCode: 409;
+    @body body: ErrorResponse;
+  };
 }
 
 // Customer management
@@ -246,6 +260,36 @@ namespace Customers {
     @body body: PaginatedResponse<Rental>;
   } | {
     @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  };
+
+  @get
+  @tag("Customers")
+  @summary("List customers")
+  @doc("List active customers with optional filtering")
+  op list(
+    @query status?: "Active" | "Suspended" | "Inactive",
+    @query employeeId?: string,
+    ...PaginationParams
+  ): {
+    @statusCode statusCode: 200;
+    @body body: PaginatedResponse<Customer>;
+  } | {
+    @statusCode statusCode: 401;
+    @body body: ErrorResponse;
+  };
+
+  @delete
+  @tag("Customers")
+  @summary("Deactivate customer")
+  @doc("Soft delete - marks customer as inactive, prevents new rentals")
+  op deactivate(@path customerId: string): {
+    @statusCode statusCode: 204;
+  } | {
+    @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  } | {
+    @statusCode statusCode: 409;
     @body body: ErrorResponse;
   };
 }
@@ -348,6 +392,21 @@ namespace Rentals {
     @statusCode statusCode: 401;
     @body body: ErrorResponse;
   };
+
+  @delete
+  @tag("Rentals")
+  @route("/{rentalId}")
+  @summary("Cancel rental")
+  @doc("Cancel active rental and process refund if applicable")
+  op cancel(@path rentalId: string): {
+    @statusCode statusCode: 204;
+  } | {
+    @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  } | {
+    @statusCode statusCode: 409;
+    @body body: ErrorResponse;
+  };
 }
 
 // Payment processing
@@ -445,11 +504,37 @@ namespace Employees {
     @statusCode statusCode: 401;
     @body body: ErrorResponse;
   };
+
+  @delete
+  @tag("Employees")
+  @summary("Deactivate employee")
+  @doc("Soft delete - marks employee as inactive, removes access")
+  op deactivate(@path employeeId: string): {
+    @statusCode statusCode: 204;
+  } | {
+    @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  } | {
+    @statusCode statusCode: 409;
+    @body body: ErrorResponse;
+  };
 }
 
 // Inventory management (essential operations only)
 @route("/inventory")
 namespace InventoryManagement {
+  @post
+  @tag("Inventory")
+  @summary("Add new video copy")
+  @doc("Add physical copy to inventory")
+  op create(@body inventory: Inventory): {
+    @statusCode statusCode: 201;
+    @body body: Inventory;
+  } | {
+    @statusCode statusCode: 400;
+    @body body: ErrorResponse;
+  };
+
   @get
   @tag("Inventory")
   @route("/video/{videoId}")
@@ -482,6 +567,21 @@ namespace InventoryManagement {
     @body body: Inventory;
   } | {
     @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  };
+
+  @delete
+  @tag("Inventory")
+  @route("/{inventoryId}")
+  @summary("Remove inventory copy")
+  @doc("Permanently remove copy from inventory (for damaged/lost items)")
+  op remove(@path inventoryId: string): {
+    @statusCode statusCode: 204;
+  } | {
+    @statusCode statusCode: 404;
+    @body body: ErrorResponse;
+  } | {
+    @statusCode statusCode: 409;
     @body body: ErrorResponse;
   };
 }

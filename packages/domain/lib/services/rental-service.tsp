@@ -6,9 +6,15 @@ namespace VideoRental.Domain.Services;
 
 using VideoRental.Domain.ValueObjects;
 
-@doc("Core rental business logic service")
+@doc("Core rental business logic service - streamlined for essential operations")
 interface RentalService {
-  @doc("Calculate rental price with employee discount")
+  @doc("Calculate rental period with due date from start date and duration")
+  createRentalPeriod(
+    @doc("Start date of rental") startDate: string,
+    @doc("Duration of rental") duration: StandardRentalDuration
+  ): RentalPeriod;
+
+  @doc("Calculate rental price with optional employee discount")
   calculateRentalPrice(
     @doc("Base price of video") basePrice: Money,
     @doc("Duration of rental") duration: StandardRentalDuration,
@@ -21,22 +27,6 @@ interface RentalService {
     @doc("Return date") returnDate: string,
     @doc("Daily late fee rate") dailyRate: Money
   ): Money;
-
-  @doc("Check if video is available for rental")
-  checkVideoAvailability(
-    @doc("Video ID") videoId: string
-  ): VideoAvailability;
-
-  @doc("Reserve a video copy for rental")
-  reserveVideoCopy(
-    @doc("Video ID") videoId: string
-  ): string; // Returns inventory copy ID
-
-  @doc("Release video copy after return")
-  releaseVideoCopy(
-    @doc("Inventory copy ID") inventoryId: string,
-    @doc("Condition after return") condition: "Excellent" | "Good" | "Fair" | "Damaged"
-  ): void;
 }
 
 @doc("Rental price calculation result")
@@ -52,19 +42,4 @@ model RentalPriceCalculation {
 
   @doc("Discount percentage applied")
   discountPercentage: decimal;
-}
-
-@doc("Video availability information")
-model VideoAvailability {
-  @doc("Whether video is available")
-  available: boolean;
-
-  @doc("Number of copies available")
-  availableCopies: int32;
-
-  @doc("Total copies owned")
-  totalCopies: int32;
-
-  @doc("Next expected return date if no copies available")
-  nextAvailableDate?: string;
 }

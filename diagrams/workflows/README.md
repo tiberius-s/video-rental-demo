@@ -79,7 +79,7 @@ graph TD
 
 ### API Summary
 
-- **25 REST endpoints** across 7 functional areas
+- **32 REST operations** across 21 endpoints in 7 functional areas
 - **Event-driven**: Status changes trigger availability updates
 - **Transactional**: Multi-step workflows with rollback support
 - **Audit Trail**: Complete history tracking for compliance

@@ -4,6 +4,7 @@ namespace VideoRental.Domain;
 model Video {
   @key("videoId")
   @format("uuid")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @doc("The ID of the video")
   id: string;
 

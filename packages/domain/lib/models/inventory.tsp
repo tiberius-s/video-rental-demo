@@ -4,6 +4,7 @@ namespace VideoRental.Domain;
 model Inventory {
   @key("inventoryId")
   @format("uuid")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @doc("The unique ID of the inventory item")
   id: string;
 

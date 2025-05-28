@@ -6,6 +6,7 @@ namespace VideoRental.Domain;
 model Customer {
   @key("customerId")
   @format("uuid")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @doc("The ID of the customer")
   id: string;
 

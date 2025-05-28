@@ -15,7 +15,6 @@ Value objects represent concepts that are defined only by their attributes and h
 - **`PhoneNumber`** - Phone number with E.164 international format validation
 - **`Money`** - Currency amount with decimal precision and ISO 4217 currency codes
 - **`RentalPeriod`** - Time period for rentals with start, due, and optional return dates
-- **`CustomerTier`** - (Reserved for future loyalty program implementation)
 
 ### 📁 Domain Models (`/models/`)
 
@@ -36,9 +35,7 @@ Core business entities representing the main concepts in the video rental domain
 Domain services encapsulate business logic that doesn't naturally fit into entities or value objects. These are internal business logic interfaces, not REST endpoints:
 
 - **`CustomerService`** - Customer business logic (eligibility checks, employee discounts, rental summaries)
-- **`RentalService`** - Rental calculations, pricing with discounts, late fees, and availability checks
-- **`InventoryService`** - Inventory management and copy tracking
-- **Simplified Versions** - Streamlined service interfaces for essential operations only
+- **`RentalService`** - Rental calculations, pricing with discounts, late fees, and rental period management
 
 ### 📁 Pragmatic DDD Approach
 
@@ -53,52 +50,59 @@ _Note: Traditional CQRS patterns (aggregates, commands, queries) are intentional
 
 ### 📁 REST API Routes (`/routes.tsp`)
 
-The API provides **25 essential endpoints** organized by business capability:
+The API provides **32 comprehensive operations** across **21 endpoints** organized by business capability:
 
-- **System Operations** (2 endpoints):
+- **System Operations** (2 operations):
 
   - `GET /health` - Health check endpoint
   - `GET /docs` - API documentation endpoint
 
-- **Video Catalog Management** (5 endpoints):
+- **Video Catalog Management** (6 operations):
 
   - `POST /videos` - Add new video to catalog
   - `GET /videos` - List videos with search and filtering
   - `GET /videos/{videoId}` - Get video details
   - `PATCH /videos/{videoId}` - Update video information
   - `GET /videos/{videoId}/availability` - Check video availability
+  - `DELETE /videos/{videoId}` - Remove video from catalog (soft delete)
 
-- **Customer Operations** (5 endpoints):
+- **Customer Operations** (7 operations):
 
   - `POST /customers` - Register new customer
+  - `GET /customers` - List customers with filtering
   - `GET /customers/{customerId}` - Get customer details
   - `PATCH /customers/{customerId}` - Update customer information
+  - `DELETE /customers/{customerId}` - Deactivate customer (soft delete)
   - `GET /customers/{customerId}/eligibility` - Check rental eligibility
   - `GET /customers/{customerId}/rentals` - Get customer rental history
 
-- **Rental Operations** (4 endpoints):
+- **Rental Operations** (5 operations):
 
   - `POST /rentals` - Create new rental with eligibility checks
   - `GET /rentals/{rentalId}` - Get rental details
+  - `DELETE /rentals/{rentalId}` - Cancel rental with refund processing
   - `POST /rentals/{rentalId}/return` - Return rented video with late fee calculation
   - `GET /rentals/overdue` - List overdue rentals for follow-up
 
-- **Payment Processing** (3 endpoints):
+- **Payment Processing** (3 operations):
 
   - `POST /payments` - Process payment for rentals and fees
   - `GET /payments/{paymentId}` - Get payment details
   - `GET /payments/customer/{customerId}` - Get customer payment history
 
-- **Employee Management** (4 endpoints):
+- **Employee Management** (5 operations):
 
   - `POST /employees` - Add new employee
+  - `GET /employees` - List active employees
   - `GET /employees/{employeeId}` - Get employee details
   - `PATCH /employees/{employeeId}` - Update employee information
-  - `GET /employees` - List active employees
+  - `DELETE /employees/{employeeId}` - Deactivate employee (soft delete)
 
-- **Inventory Management** (2 endpoints):
+- **Inventory Management** (4 operations):
+  - `POST /inventory` - Add new video copy to inventory
   - `GET /inventory/video/{videoId}` - Get all copies for a specific video
   - `PATCH /inventory/{inventoryId}` - Update inventory item status/condition
+  - `DELETE /inventory/{inventoryId}` - Remove copy from inventory (damaged/lost)
 
 ## Business Rules Implemented
 
@@ -193,7 +197,7 @@ The API provides **25 essential endpoints** organized by business capability:
 The pragmatic approach balances DDD principles with practical implementation:
 
 - **Essential Patterns Only**: Core DDD concepts without overwhelming complexity
-- **Focused API Surface**: 25 carefully chosen endpoints covering all essential workflows
+- **Comprehensive API Surface**: 32 operations across 21 endpoints covering all essential workflows and full CRUD capabilities
 - **Clean Architecture**: Streamlined structure without unused pattern folders
 - **Clear Composition**: PersonBase pattern demonstrates effective code reuse
 - **Business Rule Clarity**: Domain services encapsulate complex business logic appropriately
