@@ -6,7 +6,6 @@ import "./models/common.tsp";
 import "./models/customer.tsp";
 import "./models/video.tsp";
 import "./models/rental.tsp";
-import "./models/employee.tsp";
 import "./models/inventory.tsp";
 import "./models/payment.tsp";
 import "./models/value-objects/rental-period.tsp";
@@ -52,12 +51,6 @@ using TypeSpec.OpenAPI;
   }
 )
 @tagMetadata(
-  "Employees",
-  #{
-    description: "Employee management and role administration"
-  }
-)
-@tagMetadata(
   "Inventory",
   #{
     description: "Video copy tracking and availability management"
@@ -77,12 +70,9 @@ namespace Health {
   op check(): {
     @statusCode statusCode: 200;
     @body body: HealthResponse;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  } | {
+  } | BadRequestResponse | {
     @statusCode statusCode: 503;
-    @body body: ErrorResponse;
+    @body body: HealthResponse;
   };
 }
 
@@ -95,10 +85,7 @@ namespace Documentation {
   op getDocs(): {
     @statusCode statusCode: 200;
     @body body: ApiDocumentation;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 }
 
 // Video catalog management
@@ -110,10 +97,7 @@ namespace Videos {
   op create(@body video: Video): {
     @statusCode statusCode: 201;
     @body body: Video;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  };
+  } | BadRequestResponse;
 
   @get
   @tag("Videos")
@@ -126,10 +110,7 @@ namespace Videos {
   ): {
     @statusCode statusCode: 200;
     @body body: PaginatedResponse<Video>;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  };
+  } | BadRequestResponse;
 
   @get
   @tag("Videos")
@@ -137,10 +118,7 @@ namespace Videos {
   op read(@path videoId: string): {
     @statusCode statusCode: 200;
     @body body: Video;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @patch(#{implicitOptionality: true})
   @tag("Videos")
@@ -148,10 +126,7 @@ namespace Videos {
   op update(@path videoId: string, @body video: Video): {
     @statusCode statusCode: 200;
     @body body: Video;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @get
   @tag("Videos")
@@ -167,10 +142,7 @@ namespace Videos {
       @doc("Total copies owned")
       totalCopies: int32;
     };
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @delete
   @tag("Videos")
@@ -178,13 +150,7 @@ namespace Videos {
   @doc("Soft delete - marks video as inactive, prevents new rentals")
   op remove(@path videoId: string): {
     @statusCode statusCode: 204;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse | ConflictResponse;
 }
 
 // Customer management
@@ -196,10 +162,7 @@ namespace Customers {
   op create(@body customer: Customer): {
     @statusCode statusCode: 201;
     @body body: Customer;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  };
+  } | BadRequestResponse;
 
   @get
   @tag("Customers")
@@ -207,10 +170,7 @@ namespace Customers {
   op read(@path customerId: string): {
     @statusCode statusCode: 200;
     @body body: Customer;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @patch(#{implicitOptionality: true})
   @tag("Customers")
@@ -218,10 +178,7 @@ namespace Customers {
   op update(@path customerId: string, @body customer: Customer): {
     @statusCode statusCode: 200;
     @body body: Customer;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @get
   @tag("Customers")
@@ -242,10 +199,7 @@ namespace Customers {
       @doc("Outstanding fees")
       outstandingFees: Money;
     };
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @get
   @tag("Customers")
@@ -258,10 +212,7 @@ namespace Customers {
   ): {
     @statusCode statusCode: 200;
     @body body: PaginatedResponse<Rental>;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @get
   @tag("Customers")
@@ -269,15 +220,11 @@ namespace Customers {
   @doc("List active customers with optional filtering")
   op list(
     @query status?: "Active" | "Suspended" | "Inactive",
-    @query employeeId?: string,
     ...PaginationParams
   ): {
     @statusCode statusCode: 200;
     @body body: PaginatedResponse<Customer>;
-  } | {
-    @statusCode statusCode: 401;
-    @body body: ErrorResponse;
-  };
+  } | UnauthorizedResponse;
 
   @delete
   @tag("Customers")
@@ -285,13 +232,7 @@ namespace Customers {
   @doc("Soft delete - marks customer as inactive, prevents new rentals")
   op deactivate(@path customerId: string): {
     @statusCode statusCode: 204;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse | ConflictResponse;
 }
 
 // Rental operations - core business workflow
@@ -320,13 +261,7 @@ namespace Rentals {
       @doc("Due date")
       dueDate: string;
     };
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | BadRequestResponse | ConflictResponse;
 
   @get
   @tag("Rentals")
@@ -334,10 +269,7 @@ namespace Rentals {
   op read(@path rentalId: string): {
     @statusCode statusCode: 200;
     @body body: Rental;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @post
   @tag("Rentals")
@@ -367,13 +299,7 @@ namespace Rentals {
       @doc("Return was on time")
       onTime: boolean;
     };
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse | ConflictResponse;
 
   @get
   @tag("Rentals")
@@ -388,10 +314,7 @@ namespace Rentals {
       @doc("Total late fees outstanding")
       totalLateFees: Money;
     };
-  } | {
-    @statusCode statusCode: 401;
-    @body body: ErrorResponse;
-  };
+  } | UnauthorizedResponse;
 
   @delete
   @tag("Rentals")
@@ -400,13 +323,7 @@ namespace Rentals {
   @doc("Cancel active rental and process refund if applicable")
   op cancel(@path rentalId: string): {
     @statusCode statusCode: 204;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse | ConflictResponse;
 }
 
 // Payment processing
@@ -419,10 +336,7 @@ namespace Payments {
   op create(@body payment: Payment): {
     @statusCode statusCode: 201;
     @body body: Payment;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  };
+  } | BadRequestResponse;
 
   @get
   @tag("Payments")
@@ -430,10 +344,7 @@ namespace Payments {
   op read(@path paymentId: string): {
     @statusCode statusCode: 200;
     @body body: Payment;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @get
   @tag("Payments")
@@ -452,72 +363,7 @@ namespace Payments {
       @doc("Outstanding balance")
       outstandingBalance: Money;
     };
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
-}
-
-// Employee management
-@route("/employees")
-namespace Employees {
-  @post
-  @tag("Employees")
-  @summary("Add new employee")
-  op create(@body employee: Employee): {
-    @statusCode statusCode: 201;
-    @body body: Employee;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  };
-
-  @get
-  @tag("Employees")
-  @summary("Get employee details")
-  op read(@path employeeId: string): {
-    @statusCode statusCode: 200;
-    @body body: Employee;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
-
-  @patch(#{implicitOptionality: true})
-  @tag("Employees")
-  @summary("Update employee information")
-  op update(@path employeeId: string, @body employee: Employee): {
-    @statusCode statusCode: 200;
-    @body body: Employee;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
-
-  @get
-  @tag("Employees")
-  @summary("List active employees")
-  op list(@query activeOnly?: boolean = true, ...PaginationParams): {
-    @statusCode statusCode: 200;
-    @body body: PaginatedResponse<Employee>;
-  } | {
-    @statusCode statusCode: 401;
-    @body body: ErrorResponse;
-  };
-
-  @delete
-  @tag("Employees")
-  @summary("Deactivate employee")
-  @doc("Soft delete - marks employee as inactive, removes access")
-  op deactivate(@path employeeId: string): {
-    @statusCode statusCode: 204;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 }
 
 // Inventory management (essential operations only)
@@ -530,10 +376,7 @@ namespace InventoryManagement {
   op create(@body inventory: Inventory): {
     @statusCode statusCode: 201;
     @body body: Inventory;
-  } | {
-    @statusCode statusCode: 400;
-    @body body: ErrorResponse;
-  };
+  } | BadRequestResponse;
 
   @get
   @tag("Inventory")
@@ -552,10 +395,7 @@ namespace InventoryManagement {
       @doc("Total count")
       totalCount: int32;
     };
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @patch(#{implicitOptionality: true})
   @tag("Inventory")
@@ -565,10 +405,7 @@ namespace InventoryManagement {
   op update(@path inventoryId: string, @body inventory: Inventory): {
     @statusCode statusCode: 200;
     @body body: Inventory;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse;
 
   @delete
   @tag("Inventory")
@@ -577,11 +414,5 @@ namespace InventoryManagement {
   @doc("Permanently remove copy from inventory (for damaged/lost items)")
   op remove(@path inventoryId: string): {
     @statusCode statusCode: 204;
-  } | {
-    @statusCode statusCode: 404;
-    @body body: ErrorResponse;
-  } | {
-    @statusCode statusCode: 409;
-    @body body: ErrorResponse;
-  };
+  } | NotFoundResponse | ConflictResponse;
 }

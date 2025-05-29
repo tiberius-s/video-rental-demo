@@ -2,7 +2,7 @@
 
 ## Complete API Operations Implemented
 
-### 📋 **Total: 32 Operations across 21 Endpoints**
+### 📋 **Total: 27 Operations across 17 Endpoints**
 
 ---
 
@@ -50,7 +50,7 @@
 **Business Functions Covered:**
 
 - ✅ Complete customer lifecycle management
-- ✅ Employee discount integration
+- ✅ Customer discount support
 - ✅ Rental eligibility checking
 - ✅ Customer status management
 - ✅ Complete rental history tracking
@@ -88,28 +88,9 @@
 **Business Functions Covered:**
 
 - ✅ Multiple payment method support
-- ✅ Employee discount application
+- ✅ Customer discount application
 - ✅ Payment type handling (rental, late fees, damage, refunds)
 - ✅ Complete payment audit trail
-
----
-
-## **Employee Management** (5 operations)
-
-| Method   | Endpoint                         | Purpose                     | Status      |
-| -------- | -------------------------------- | --------------------------- | ----------- |
-| `POST`   | `/api/v1/employees`              | Add new employee            | ✅ Complete |
-| `GET`    | `/api/v1/employees`              | List active employees       | ✅ Complete |
-| `GET`    | `/api/v1/employees/{employeeId}` | Get employee details        | ✅ Complete |
-| `PATCH`  | `/api/v1/employees/{employeeId}` | Update employee information | ✅ Complete |
-| `DELETE` | `/api/v1/employees/{employeeId}` | Deactivate employee         | ✅ Complete |
-
-**Business Functions Covered:**
-
-- ✅ Complete employee lifecycle management
-- ✅ Role-based access and discount management
-- ✅ Employee-customer integration for discounts
-- ✅ Active status management
 
 ---
 
@@ -138,7 +119,7 @@
 1. **📋 Customer Registration & Management**
 
    - New customer registration with validation
-   - Employee discount linking
+   - Customer discount management
    - Status management (Active, Suspended, Inactive)
    - Complete customer lifecycle
 
@@ -159,7 +140,7 @@
 4. **🎯 Rental Operations**
 
    - Create new rentals with eligibility checks
-   - Employee discount application
+   - Customer discount application
    - Return processing with late fee calculation
    - Rental cancellation and refunds
 
@@ -167,17 +148,10 @@
 
    - Multiple payment methods (cash, card, check, gift card)
    - Payment for rentals, late fees, damage charges
-   - Employee discount integration
+   - Customer discount integration
    - Complete payment history
 
-6. **👥 Employee Management**
-
-   - Employee registration and role assignment
-   - Discount percentage management
-   - Employee-customer dual roles
-   - Active status management
-
-7. **⏰ Overdue Management**
+6. **⏰ Overdue Management**
    - Automated overdue detection
    - Late fee calculation and tracking
    - Customer account management
@@ -185,7 +159,7 @@
 ### ✅ **Business Rules Enforced**
 
 - **Customer Eligibility**: No rentals with overdue items
-- **Employee Discounts**: Role-based discounts (Manager 25%, Supervisor 20%, Clerk 15%)
+- **Customer Discounts**: Configurable discount percentages per customer
 - **Inventory Tracking**: One-to-one rental to physical copy relationship
 - **Late Fee Management**: Daily accumulation with configurable caps
 - **Payment Validation**: Comprehensive payment type and method support
@@ -206,11 +180,11 @@
 
 The Video Rental Store API now provides **complete functionality** for operating a full-service video rental business with:
 
-- **32 operations** covering all essential business workflows
+- **27 operations** covering all essential business workflows
 - **Complete CRUD support** for all domain entities
 - **Comprehensive business rule enforcement**
 - **Real-time inventory and availability management**
-- **Full customer and employee lifecycle management**
-- **Integrated payment processing with discount support**
+- **Full customer lifecycle management with discount support**
+- **Integrated payment processing with customer discount support**
 
 The API design follows **Domain-Driven Design principles** with a **pragmatic approach** that balances essential business patterns with practical implementation requirements.

@@ -12,8 +12,8 @@ model Customer {
 
   ...PersonBase;
 
-  @doc("Employee ID if this customer is also an employee (for discount purposes)")
-  employeeId?: string;
+  @doc("Customer discount percentage (0-100)")
+  discountPercentage?: decimal;
 
   @format("date")
   @doc("Date customer joined")

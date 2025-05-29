@@ -14,11 +14,11 @@ interface RentalService {
     @doc("Duration of rental") duration: StandardRentalDuration
   ): RentalPeriod;
 
-  @doc("Calculate rental price with optional employee discount")
+  @doc("Calculate rental price with optional customer discount")
   calculateRentalPrice(
     @doc("Base price of video") basePrice: Money,
     @doc("Duration of rental") duration: StandardRentalDuration,
-    @doc("Employee discount percentage (0-100)") employeeDiscountPercentage?: decimal
+    @doc("Customer discount percentage (0-100)") customerDiscountPercentage?: decimal
   ): RentalPriceCalculation;
 
   @doc("Calculate late fees for overdue rental")
@@ -34,7 +34,7 @@ model RentalPriceCalculation {
   @doc("Original price before discount")
   basePrice: Money;
 
-  @doc("Employee discount amount")
+  @doc("Customer discount amount")
   discountAmount: Money;
 
   @doc("Final price after discount")

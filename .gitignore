@@ -45,3 +45,6 @@ coverage/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Miscellaneous
+scratch.md

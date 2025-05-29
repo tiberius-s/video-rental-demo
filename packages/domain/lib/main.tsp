@@ -6,7 +6,6 @@ import "./routes.tsp";
 // Import essential models and value objects
 import "./models/common.tsp";
 import "./models/customer.tsp";
-import "./models/employee.tsp";
 import "./models/video.tsp";
 import "./models/rental.tsp";
 import "./models/inventory.tsp";
@@ -35,7 +34,7 @@ A streamlined RESTful API focused on core video rental store operations.
 
 ## Core Features
 
-- **Customer Management**: Essential customer operations with employee discount support
+- **Customer Management**: Essential customer operations with discount support
 - **Video Catalog**: Basic video catalog with availability tracking
 - **Rental Operations**: Complete rental lifecycle from creation to return
 - **Inventory Management**: Copy tracking and availability management
@@ -43,7 +42,7 @@ A streamlined RESTful API focused on core video rental store operations.
 
 ## Business Rules
 
-- **Employee Discounts**: Staff members receive automatic discounts on rentals
+- **Customer Discounts**: Customers can receive discounts on rentals
 - **Rental Eligibility**: Customers must have no overdue rentals to rent new videos
 - **Late Fees**: Calculated automatically when videos are returned after due date
 - **Inventory Tracking**: Simple copy availability and condition tracking
@@ -52,7 +51,7 @@ A streamlined RESTful API focused on core video rental store operations.
 
 - Focus on essential business workflows
 - Minimize complex reporting and analytics
-- Streamlined employee management
+- Streamlined customer management
 - Clear separation of core vs. administrative operations
 
 This API provides all essential rental store functionality while maintaining simplicity.

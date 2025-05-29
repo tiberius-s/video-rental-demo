@@ -5,22 +5,6 @@ using TypeSpec.Http;
 
 namespace VideoRental.Domain;
 
-@doc("Standard error response")
-model ErrorResponse {
-  @doc("Error code")
-  code: string;
-
-  @doc("Human readable error message")
-  message: string;
-
-  @doc("Additional error details")
-  details?: string;
-
-  @doc("Timestamp of the error")
-  @format("date-time")
-  timestamp: string;
-}
-
 @doc("API health status response")
 model HealthResponse {
   @doc("Service status")

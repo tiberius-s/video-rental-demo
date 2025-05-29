@@ -12,8 +12,8 @@ interface CustomerService {
     @doc("Customer ID") customerId: string
   ): CustomerEligibility;
 
-  @doc("Get employee discount percentage if customer is employee")
-  getEmployeeDiscountPercentage(
+  @doc("Get customer discount percentage")
+  getCustomerDiscountPercentage(
     @doc("Customer ID") customerId: string
   ): decimal;
 
@@ -66,9 +66,6 @@ model CustomerRentalSummary {
   @doc("Outstanding balance")
   outstandingBalance: Money;
 
-  @doc("Is customer also an employee")
-  isEmployee: boolean;
-
-  @doc("Employee discount percentage if applicable")
-  employeeDiscountPercentage?: decimal;
+  @doc("Customer discount percentage")
+  discountPercentage: decimal;
 }
