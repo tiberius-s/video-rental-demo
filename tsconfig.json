@@ -6,5 +6,11 @@
     "useDefineForClassFields": true,
     "sourceMap": true,
     "declaration": true
-  }
+  },
+  "references": [
+    { "path": "./packages/domain" },
+    { "path": "./packages/api" },
+    { "path": "./packages/db" }
+  ],
+  "files": []
 }
