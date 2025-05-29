@@ -5,8 +5,9 @@
     "moduleResolution": "NodeNext",
     "rootDir": "src",
     "outDir": "dist",
-    "composite": true
+    "composite": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules", "tsp-output"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["dist", "node_modules", "tsp-output", "lib", "**/*.tsp", "**/*.test.*", "test"]
 }

@@ -34,6 +34,9 @@ packages/**/test/**/*.js
 # TypeSpec output
 **/tsp-output/
 
+# Generated files
+**/generated/
+
 # Test coverage
 coverage/
 

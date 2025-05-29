@@ -17,10 +17,10 @@
   },
   "dependencies": {
     "@video-rental/domain": "^0.1.0",
-    "express": "^5.0.1",
+    "express": "^5.1.0",
     "pino": "^9.6.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0"
+    "@types/express": "^5.0.2"
   }
 }

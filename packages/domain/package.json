@@ -31,11 +31,10 @@
     "@typespec/rest": "^0.70.0"
   },
   "scripts": {
-    "build": "tsc && npm run build:tsp",
+    "build": "npm run build:tsp && npm run build:ts",
+    "build:ts": "tsc",
     "build:tsp": "tsp compile . --warn-as-error --import @typespec/library-linter",
     "clean": "rm -rf dist *.tsbuildinfo tsp-output/",
-    "codegen:models": "node -e \"import('./dist/src/codegen.js').then(m => m.generateModels('./generated/models'))\"",
-    "codegen:sql": "node -e \"import('./dist/codegen.js').then(m => console.log(m.generateSqlSchema()))\"",
     "tsp:compile": "tsp compile .",
     "tsp:watch": "tsp compile . --watch",
     "tsp:format": "tsp format lib/**/*.tsp",

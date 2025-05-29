@@ -1,4 +1,6 @@
 import { openApiSpec } from "./openapi.js";
+import { writeFileSync, mkdirSync } from "fs";
+import { dirname } from "path";
 
 /**
  * Generate SQL schema from OpenAPI specification
@@ -71,4 +73,19 @@ function getSqlType(schema: any): string {
     default:
       return "TEXT";
   }
+}
+
+/**
+ * Generate SQL schema file from OpenAPI specification
+ */
+export function generateSqlSchemaFile(outputPath: string = "./schema.sql"): void {
+  const sqlContent = generateSqlSchema();
+
+  // Ensure the directory exists
+  const dir = dirname(outputPath);
+  mkdirSync(dir, { recursive: true });
+
+  // Write the SQL file
+  writeFileSync(outputPath, sqlContent, "utf8");
+  console.log(`SQL schema generated: ${outputPath}`);
 }
