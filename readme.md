@@ -1,140 +1,244 @@
-# Video Rental Demo
+# Video Rental Store - A Domain-Driven Design Tutorial
 
-Technical demo exploring npm workspaces, TypeSpec, and OpenAPI by implementing a video rental store with Domain-Driven Design principles, focused on core business workflows.
+Welcome! This project is a hands-on exploration of Domain-Driven Design (DDD) and monorepo architecture. We're building a video rental store - think old-school Blockbuster - to learn how to structure complex applications around business domains.
 
-## Architecture
+## Why This Project Exists
 
-This project demonstrates:
+Instead of diving into abstract DDD theory, we'll learn by doing. This tutorial demonstrates:
 
-- **TypeSpec** for API-first development with streamlined OpenAPI generation
-- **Domain-Driven Design** patterns focusing on essential business logic
-- **npm workspaces** for monorepo management
-- **Type-safe database operations** with better-sqlite3
-- **Modern Node.js testing** with built-in test runner
+- **Domain-First Development**: Starting with business rules, not databases or APIs
+- **TypeSpec for API Design**: Generating everything from domain models
+- **Monorepo Structure**: Managing multiple related packages
+- **Modern Node.js**: Using the latest tools and patterns
+
+The beauty of DDD is that it helps us think like the business while building software that actually works for real people.
+
+## What You'll Learn
+
+### 🎯 Domain-Driven Design Fundamentals
+
+- How to identify and model business domains
+- The difference between entities, value objects, and domain services
+- Why business logic should live in the domain, not scattered across your app
+- How to make the code speak the business language
+
+### 🏗️ Monorepo Architecture
+
+- Organizing related packages in a single repository
+- Managing dependencies between packages
+- Build order strategies and workspace configuration
+- Sharing domain knowledge across multiple applications
+
+### 🔧 Modern Tooling
+
+- **TypeSpec**: API-first development with type safety
+- **npm workspaces**: Monorepo package management
+- **SQLite**: Simple, file-based database for prototyping
+- **Domain-first builds**: Let business logic drive everything else
+
+## How This Tutorial Works
+
+We've intentionally chosen a simple, familiar domain - renting videos - so you can focus on the architectural patterns rather than complex business rules. Everyone understands what it means to rent a movie, pay late fees, and return it in good condition.
+
+### The Learning Journey
+
+**Start Here**: If you're new to DDD, begin with [`diagrams/`](./diagrams/) to understand the business domain visually.
+
+**Then Explore**: Look at [`packages/domain/`](./packages/domain/) to see how business concepts become code.
+
+**Finally Build**: Run the project to see how domain-driven development creates clean, maintainable applications.
 
 ## Domain-First Development Workflow
 
-This project implements a comprehensive **domain-first development workflow** where the domain package serves as the single source of truth for:
+The key insight of this project is **domain-first development** - we start with business logic and generate everything else from it. Here's how it works:
 
-### 📦 **Package Dependencies & Exports**
+### 📦 Package Architecture
 
-- **Domain Package** (`@video-rental/domain`)
+Our monorepo has three main packages that depend on each other in a specific order:
 
-  - Exports OpenAPI specification as importable module
-  - Provides TypeScript utilities for spec loading and caching
-  - Generates SQL schema from domain models
-  - Single source of truth for business models
+1. **Domain Package** (`@video-rental/domain`) - The business logic foundation
 
-- **API Package** (`@video-rental/api`)
+   - Contains all business rules and models
+   - Generates OpenAPI specifications from TypeSpec
+   - Provides SQL schemas for database setup
+   - Acts as the single source of truth
 
-  - Imports domain package: `import { getOpenApiSpec } from "@video-rental/domain"`
-  - Uses OpenAPI spec for endpoint documentation and validation
-  - Extracts runtime models from OpenAPI components/schema
+2. **Database Package** (`@video-rental/db`) - Data persistence layer
 
-- **DB Package** (`@video-rental/db`)
-  - Imports domain package for schema generation
-  - Uses generated `init.sql` to initialize SQLite database
-  - Type-safe database operations based on domain models
+   - Imports domain models to generate database schemas
+   - Provides type-safe database operations
+   - Uses SQLite for simplicity in this tutorial
 
-### 🔄 **Build Process**
+3. **API Package** (`@video-rental/api`) - HTTP interface layer
 
-**Sequential Build Order**: `domain` → `db` → `api`
+   - Imports the OpenAPI spec from the domain package
+   - Provides REST endpoints matching domain operations
+   - Validates requests against domain rules
+
+### 🔄 The Build Process Explained
+
+Understanding the build order is crucial to understanding how domain-first development works:
 
 ```bash
-# Root-level build (builds all packages in correct order)
-npm run build
+# This is the order that matters:
+npm run build --workspace @video-rental/domain  # Business rules first
+npm run build --workspace @video-rental/db      # Then data storage
+npm run build --workspace @video-rental/api     # Finally the HTTP interface
 
-# Individual package builds
-npm run build --workspace @video-rental/domain  # TypeSpec + TypeScript
-npm run build --workspace @video-rental/db      # Uses domain types
-npm run build --workspace @video-rental/api     # Uses domain spec
+# Or just build everything in the right order:
+npm run build
 ```
 
-### 📁 **Compilation Strategy**
+**Why This Order Matters:**
 
-**Domain Package Build Process**:
+1. **Domain First**: We define what the business needs before we think about databases or APIs
+2. **Database Second**: We create storage that matches the business model
+3. **API Last**: We expose business operations through HTTP endpoints
 
-1. **TypeSpec Compilation**: `npm run build:tsp`
+This is the opposite of most tutorials that start with database tables!
 
-   - Generates OpenAPI spec to `tsp-output/@typespec/openapi3/openapi.json`
-   - Validates TypeSpec models and generates documentation
+### 📁 What Gets Generated
 
-2. **TypeScript Compilation**: `npm run build:ts`
-   - Compiles TypeScript utilities to `dist/`
-   - Generates type declarations for other packages
-   - Excludes TypeSpec files to prevent compilation conflicts
+When you build the domain package, here's what happens:
 
-**Key Configuration**:
+1. **TypeSpec Compilation**: Business models become OpenAPI specifications
 
-- All TypeScript projects compile **only to `dist/`** folder
-- No compiled files in `src/` directories
-- TypeScript project references ensure proper dependency resolution
-- `composite: true` enables incremental builds across packages
+   - Location: `tsp-output/@typespec/openapi3/openapi.json`
+   - Contains all API endpoints, request/response schemas, and validation rules
 
-### 🚀 **Workflow Benefits**
+2. **TypeScript Compilation**: Domain code becomes reusable packages
 
-✅ **Single Source of Truth**: Domain models define API, database, and business logic
-✅ **Type Safety**: Full TypeScript integration across all packages
-✅ **Automatic Code Generation**: OpenAPI specs and SQL schemas generated from domain
-✅ **Development Workflow**: Domain changes automatically propagate to API and DB
-✅ **Documentation**: Business workflows and API docs stay in sync with code
-✅ **Validation**: TypeSpec ensures model consistency and API contract compliance
+   - Location: `dist/` folder
+   - Provides utilities for other packages to import domain knowledge
 
-## Domain Focus
+### 🚀 Why This Approach Works
 
-✅ **Essential Features:**
+**Single Source of Truth**: Change a business rule in one place, and it updates everywhere.
 
-- Video rental process (rent → pay → return)
-- Customer management with employee discounts
-- Inventory tracking and availability
-- Payment processing with late fees
-- Basic employee management
+**Type Safety**: TypeScript ensures your API and database match your domain models.
 
-## Packages
+**Documentation That Stays Current**: Since docs are generated from code, they never get out of date.
 
-### 🎯 **Domain Package** - `@video-rental/domain`
+**Testing Made Easy**: Business logic is separated from infrastructure, making unit tests simpler.
 
-#### Single source of truth for business models and API contracts
+## Exploring the Domain
 
-**Exports:**
+Let's look at what makes a video rental business tick.
 
-- `getOpenApiSpec()` - OpenAPI specification loader with caching
-- `generateSqlSchema()` - SQL schema generation from domain models
-- `generateSqlSchemaFile()` - Generate SQL schema file from domain models
-- TypeScript domain utilities and type definitions
+### Core Business Operations
 
-**Features:**
+We've modeled the essential workflows of a video rental business:
 
-- TypeSpec domain models with comprehensive business rules
-- OpenAPI 3.0 specification generation
-- Domain-Driven Design patterns and value objects
-- Business workflow documentation with Mermaid diagrams
+**Customer Management**: People need accounts to rent videos
 
-**Build Output:**
+- Registration with personal information
+- Discount percentage tracking (for loyal customers)
+- Account status management (active, suspended, inactive)
 
-- `dist/` - Compiled TypeScript utilities
-- `tsp-output/@typespec/openapi3/openapi.json` - Generated OpenAPI spec
+**Video Catalog**: The movies and shows available for rent
 
-### 🔌 **API Package** - `@video-rental/api`
+- Basic metadata (title, genre, rating, director)
+- Pricing information
+- Availability tracking
 
-#### REST API implementation using domain contracts
+**Inventory Tracking**: Physical copies of videos
 
-**Dependencies:**
+- Each video can have multiple copies
+- Condition tracking (Good or Defective - we keep it simple)
+- Status management (Available, Rented, Retired)
 
-- Imports from `@video-rental/domain`
-- Uses OpenAPI spec for endpoint documentation
-- Extracts runtime models from OpenAPI components/schema
+**Rental Process**: The core business transaction
 
-**Features:**
+- Customers rent specific copies of videos
+- Automatic discount application for eligible customers
+- Due date tracking and late fee calculation
 
-- Express.js REST API server
-- OpenAPI-driven endpoint generation
+**Payment Handling**: Money management
+
+- Multiple payment types (rental fees, late fees, damage fees, membership)
+- Various payment methods (cash, cards, checks, gift cards)
+- Transaction history and status tracking
+
+### What We Simplified
+
+Real video stores had complex business rules, but we've streamlined things for learning:
+
+- **No Employee Management**: We focus on customer-facing operations
+- **Binary Condition Assessment**: Videos are either Good or Defective
+- **Simplified Discounts**: Just a percentage field per customer
+- **Basic Rental Periods**: Standard due dates without complex tier systems
+
+This keeps the domain understandable while still demonstrating important DDD patterns.
+
+## Diving Into the Code
+
+Now that you understand the business domain, let's explore how DDD principles shape the code structure.
+
+### 🎯 The Domain Package - Your Business Logic Home
+
+**Location**: [`packages/domain/`](./packages/domain/)
+
+This is where all business knowledge lives. Think of it as the brain of your application.
+
+**What's Inside:**
+
+- **Domain Models** (`lib/models/`): The core business entities
+
+  - `Customer`: Who rents videos
+  - `Video`: What gets rented
+  - `Rental`: The transaction connecting customers and videos
+  - `Inventory`: Physical copies of videos
+  - `Payment`: Money changing hands
+
+- **Value Objects** (`lib/models/value-objects/`): Business concepts without identity
+
+  - `Address`: Where customers live
+  - `Email`: Contact information with validation
+  - `Money`: Currency amounts with precision
+  - `RentalPeriod`: Time spans for rentals
+
+- **Domain Services** (`lib/services/`): Business logic that doesn't belong to a single entity
+  - `CustomerService`: Customer eligibility and discount logic
+  - `RentalService`: Rental calculations and business rules
+
+**Why This Matters**: When business rules change, you only need to update this package. Everything else follows automatically.
+
+### 🗄️ The Database Package - Persistence Made Simple
+
+**Location**: [`packages/db/`](./packages/db/)
+
+This package knows how to store and retrieve domain objects, but it doesn't contain business logic.
+
+**What It Does:**
+
+- Imports domain models to understand what to store
+- Generates SQL schemas from domain definitions
+- Provides type-safe database operations
+- Uses SQLite for tutorial simplicity (easily swappable for production databases)
+
+**Key Insight**: The database schema is generated from domain models, not designed separately. This means your database always matches your business logic.
+
+### 🌐 The API Package - HTTP Interface Layer
+
+**Location**: [`packages/api/`](./packages/api/)
+
+This package exposes domain operations through HTTP endpoints.
+
+**What It Provides:**
+
+- REST API endpoints for all domain operations
+- Request/response validation using domain rules
+- OpenAPI documentation generated from domain models
+- Express.js server setup with proper middleware
+
+**The Magic**: API endpoints are defined once in the domain package using TypeSpec, then automatically become HTTP endpoints here.
+
 - Request/response validation (planned)
 - Authentication and middleware
 
 ### 🗄️ **DB Package** - `@video-rental/db`
 
-_Database layer with type-safe operations_
+#### Database layer with type-safe operations
 
 **Dependencies:**
 
@@ -149,65 +253,127 @@ _Database layer with type-safe operations_
 - Type-safe database operations
 - Migration and seeding utilities
 
-## Quick Start
+## Getting Started - Your First Steps
+
+Ready to explore domain-driven development? Here's how to dive in:
+
+### Prerequisites
+
+- **Node.js 18+**: We use modern Node.js features
+- **Basic TypeScript knowledge**: Helpful but not required
+- **Curiosity about business modeling**: The most important ingredient!
+
+### Quick Start
+
+```bash
+# Clone and explore the project
+git clone <repository-url>
+cd video-rental-demo
+
+# Install all dependencies for the monorepo
+npm install
+
+# Build everything in the right order
+npm run build
+
+# Explore the generated OpenAPI specification
+cat packages/domain/tsp-output/@typespec/openapi3/openapi.json | jq '.'
+
+# Start the API server (if implemented)
+npm run dev --workspace @video-rental/api
+```
+
+### Exploration Guide
+
+**For DDD Beginners**: Start with [`diagrams/`](./diagrams/) to see the business domain visually.
+
+**For Monorepo Learners**: Check out [`package.json`](./package.json) to see workspace configuration.
+
+**For TypeSpec Curious**: Explore [`packages/domain/lib/`](./packages/domain/lib/) to see business models in code.
+
+**For Architecture Fans**: Read [`diagrams/workflows/00-workflow-interconnections.md`](./diagrams/workflows/00-workflow-interconnections.md) to understand system integration.
+
+## Learning by Doing - Development Workflows
+
+Let's walk through some common development scenarios to understand how domain-first development works in practice.
+
+### Scenario 1: Adding a New Business Rule
+
+Imagine we want to add "maximum rental duration" - customers can't rent videos for more than 7 days.
+
+**Domain-First Approach:**
+
+1. **Think Business First**: What does this rule mean for customers? For the rental process?
+
+2. **Update the Domain Model** (`packages/domain/lib/models/rental.tsp`):
+
+   ```typescript
+   // Add validation to RentalPeriod
+   model RentalPeriod {
+     startDate: string; // date format
+     dueDate: string;   // date format - max 7 days from start
+     returnDate?: string; // nullable
+   }
+   ```
+
+3. **Rebuild and Propagate**:
+
+   ```bash
+   npm run build --workspace @video-rental/domain
+   # This updates the OpenAPI spec, which updates the API validation
+   # and database constraints automatically
+   ```
+
+**Traditional Approach** (what we're avoiding):
+
+- Update database schema
+- Update API validation
+- Update documentation
+- Hope everything stays in sync
+
+### Scenario 2: Understanding Package Dependencies
+
+Watch what happens when you build:
+
+```bash
+# This will fail because db and api depend on domain
+npm run build --workspace @video-rental/api
+# Error: Cannot find module '@video-rental/domain'
+
+# This works because we build dependencies first
+npm run build --workspace @video-rental/domain
+npm run build --workspace @video-rental/api
+# Success!
+
+# Or just let npm workspaces handle the order
+npm run build
+```
+
+**Learning Point**: Dependencies flow from domain outward. This enforces the architectural principle that business logic doesn't depend on infrastructure.
+
+### Scenario 3: Exploring Generated Code
+
+See how business models become running applications:
+
+```bash
+# Look at what TypeSpec generates
+npm run build:tsp --workspace @video-rental/domain
+ls packages/domain/tsp-output/@typespec/openapi3/
+
+# The generated OpenAPI spec contains:
+# - All your business models as JSON schemas
+# - API endpoints with proper HTTP methods
+# - Validation rules from your domain constraints
+# - Documentation from your TypeSpec comments
+```
+
+## Quick Setup Commands
 
 ```bash
 # Install dependencies for all workspaces
 npm install
 
 # Build all packages in correct order (domain → db → api)
-npm run build
-
-# Generate OpenAPI specification from TypeSpec
-npm run tsp:compile
-
-# Format and lint code
-npm run format && npm run lint
-```
-
-## Development Workflow Examples
-
-### 🔄 **Typical Development Flow**
-
-1. **Modify Domain Models** (TypeSpec in `packages/domain/lib/`)
-2. **Rebuild Domain Package** to generate new OpenAPI spec
-3. **Update API Package** to use new domain contracts
-4. **Update DB Package** to reflect schema changes
-
-```bash
-# After modifying TypeSpec models - rebuild domain package
-npm run build --workspace @video-rental/domain
-
-# API package automatically gets updated domain types
-npm run build --workspace @video-rental/api
-
-# DB package gets updated schema
-npm run build --workspace @video-rental/db
-```
-
-### 📝 **Adding New Business Models**
-
-1. **Define TypeSpec Model** in `packages/domain/lib/models/`
-2. **Add to Routes** in `packages/domain/lib/routes.tsp`
-3. **Generate OpenAPI** with `npm run build:tsp --workspace @video-rental/domain`
-4. **Import in API** using `import { getOpenApiSpec } from "@video-rental/domain"`
-
-### 🗄️ **Database Schema Updates**
-
-```bash
-# Use domain package utilities to generate SQL schema
-import { generateSqlSchemaFile } from "@video-rental/domain"
-generateSqlSchemaFile("./path/to/schema.sql")
-
-# Rebuild DB package to incorporate new schema
-npm run build --workspace @video-rental/db
-```
-
-### 🔍 **Checking Domain-API Integration**
-
-```bash
-# Start with clean build
-npm run clean
 npm run build
 
 # Test cross-package imports work correctly
@@ -231,7 +397,7 @@ npm run build --workspace @video-rental/domain
 npm run clean
 ```
 
-### TypeSpec Development
+## TypeSpec Development
 
 ```bash
 # Compile TypeSpec to OpenAPI (domain package)
@@ -349,7 +515,7 @@ This project implements a **domain-first monorepo architecture** where:
 
 ### 📦 **Package Dependency Graph**
 
-```
+```text
 Domain Package (TypeSpec + TypeScript)
     ├── Exports: getOpenApiSpec(), generateSqlSchema()
     ├── Generates: OpenAPI spec, Type declarations

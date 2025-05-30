@@ -16,93 +16,77 @@ The video rental store domain consists of the following core entities and their 
 
 ```mermaid
 erDiagram
-    %% Core Business Entities
+    %% Core Business Entities with improved layout
     Customer {
         string id PK "UUID"
-        string name "1-255 chars"
+        string name "Required 1-255 chars"
         Email email "RFC-compliant"
-        Address address "US address"
+        Address address "US address embedded"
         PhoneNumber phoneNumber "E.164 format"
-        decimal discountPercentage "0-100, nullable"
-        string memberSince "date format"
-        CustomerStatus status "Active|Suspended|Inactive"
+        decimal discountPercentage "0-100 nullable"
+        string memberSince "Date format"
+        CustomerStatus status "Active~Suspended~Inactive"
     }
 
     Video {
         string id PK "UUID"
-        string title "1-255 chars"
-        string genre
-        string rating "MPAA rating G|PG|PG-13|R|NC-17"
-        int32 releaseYear
-        int32 duration "minutes"
-        string description
-        string director
-        decimal rentalPrice "daily rate"
-        int32 availableCopies "calculated"
-        int32 totalCopies "total owned"
+        string title "Required 1-255 chars"
+        string genre "Movie category"
+        string rating "G~PG~PG-13~R~NC-17"
+        int32 releaseYear "Year published"
+        int32 duration "Runtime in minutes"
+        string description "Movie synopsis"
+        string director "Director name"
+        decimal rentalPrice "Daily rate USD"
+        int32 availableCopies "Calculated field"
+        int32 totalCopies "Total inventory"
     }
 
     Inventory {
         string id PK "UUID"
-        string videoId FK
-        string copyId "physical identifier"
-        CopyCondition condition "Good|Defective"
-        CopyStatus status "Available|Rented|Retired"
-        string dateAcquired "date format"
-        string lastRentedDate "nullable date"
+        string videoId FK "References Video"
+        string copyId "Physical identifier"
+        CopyCondition condition "Good~Defective"
+        CopyStatus status "Available~Rented~Retired"
+        string dateAcquired "Date format"
+        string lastRentedDate "Nullable date"
     }
 
     Rental {
         string id PK "UUID"
-        string customerId FK
-        string videoId FK
-        string inventoryId FK "specific copy rented"
-        RentalPeriod period "start|due|return dates"
-        Money rentalFee "amount charged"
-        Money lateFee "nullable late charges"
-        RentalStatus status "Active|Returned|Overdue|Cancelled|Extended"
+        string customerId FK "References Customer"
+        string videoId FK "References Video"
+        string inventoryId FK "Specific copy"
+        RentalPeriod period "Start~Due~Return dates"
+        Money rentalFee "Amount charged"
+        Money lateFee "Nullable late charges"
+        RentalStatus status "Active~Returned~Overdue~Cancelled~Extended"
     }
 
     Payment {
         string id PK "UUID"
-        string customerId FK
-        string rentalId FK "nullable - may not be rental-specific"
-        Money amount "with currency"
-        PaymentType paymentType "Rental|LateFee|Damage|Membership"
-        PaymentMethod paymentMethod "Cash|CreditCard|DebitCard|Check|GiftCard"
-        string paymentDate "date-time format"
-        string referenceNumber "nullable transaction ref"
-        PaymentStatus status "Completed|Pending|Failed|Refunded|Cancelled"
+        string customerId FK "References Customer"
+        string rentalId FK "Nullable rental ref"
+        Money amount "Amount with currency"
+        PaymentType paymentType "Rental~LateFee~Damage~Membership"
+        PaymentMethod paymentMethod "Cash~CreditCard~DebitCard~Check~GiftCard"
+        string paymentDate "DateTime format"
+        string referenceNumber "Nullable transaction ref"
+        PaymentStatus status "Completed~Pending~Failed~Refunded~Cancelled"
     }
 
-    Address {
-        string street
-        string city
-        State state "US State (50 states: AL, AK, AZ, AR...WY)"
-        string zipCode
-    }
-
-    %% Relationships
-
-    %% Customer Relationships
-    Customer ||--o{ Rental : "rents videos"
-    Customer ||--o{ Payment : "makes payments"
-
-    %% Video Relationships
-    Video ||--o{ Inventory : "has physical copies"
-    Video ||--o{ Rental : "is rented"
-
-    %% Inventory Relationships
-    Inventory }|--|| Video : "is copy of"
-
-    %% Rental Relationships
-    Rental }|--|| Customer : "rented by"
+    %% Relationship definitions with clear cardinality
+    Customer ||--o{ Rental : "places"
+    Customer ||--o{ Payment : "makes"
+    Video ||--o{ Inventory : "has_copies"
+    Video ||--o{ Rental : "rented_as"
+    Inventory }|--|| Video : "copy_of"
+    Inventory ||--o| Rental : "specific_copy"
+    Rental }|--|| Customer : "rented_by"
     Rental }|--|| Video : "rents"
-    Rental ||--o{ Payment : "generates payments"
-
-    %% Payment Relationships
-    Payment }|--|| Customer : "paid by"
-    Payment }|--o| Rental : "pays for"
+    Rental ||--o{ Payment : "generates"
+    Payment }|--|| Customer : "paid_by"
+    Payment }|--o| Rental : "for_rental"
 ```
 
 ## Business Rules and Constraints

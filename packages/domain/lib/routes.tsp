@@ -283,7 +283,7 @@ namespace Rentals {
       @format("date-time")
       returnDate: string;
       @doc("Condition of returned copy")
-      condition?: "Excellent" | "Good" | "Fair" | "Damaged";
+      condition?: CopyCondition;
       @doc("Return notes")
       notes?: string;
     }

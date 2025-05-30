@@ -1,48 +1,59 @@
-# Video Rental Store - Diagrams & Documentation
+# Learning Domain-Driven Design Through Diagrams
 
-This folder contains comprehensive documentation and visual diagrams for the Video Rental Store domain implementation.
+Welcome to the visual learning center! This folder contains diagrams and documentation that teach Domain-Driven Design concepts through a familiar business domain - video rental.
 
-## 📋 Documentation Files
+## Why Start Here?
 
-### [`DDD-IMPLEMENTATION.md`](./DDD-IMPLEMENTATION.md)
+Before diving into code, it's helpful to understand the business domain visually. These diagrams answer fundamental questions:
 
-Detailed Domain-Driven Design implementation documentation covering:
+- **What does the business do?** (Entity relationships and workflows)
+- **How do the pieces fit together?** (System architecture and dependencies)
+- **What happens when customers interact with the system?** (Sequence diagrams)
 
-- **Domain Structure**: Value objects, domain models, and services
-- **Business Rules**: Customer management, rental logic, inventory tracking
-- **API Overview**: 32 operations across 21 endpoints covering complete CRUD operations
-- **Technical Implementation**: TypeSpec-based development approach
-- **Architectural Benefits**: Separation of concerns and type safety
+Think of this as your business analysis before writing any code.
 
-### [`ERD.md`](./ERD.md)
+## Your Learning Path
 
-Entity Relationship documentation describing:
+### 🌱 **Start Here: Understanding the Business**
 
-- **Core Entities**: Customer, Employee, Video, Rental, Payment, Inventory
-- **Relationships**: How entities connect and interact
-- **Business Rules**: Constraints and validation rules
-- **Data Flow**: How information moves through the system
+1. **[Entity Relationship Diagram](./ERD.md)** - See the core business entities and how they relate
 
-## 🎨 Visual Diagrams
+   - What is a Customer? A Video? A Rental?
+   - How does money flow through the system?
+   - What business rules govern these relationships?
 
-### [`video-rental-erd.excalidraw`](./video-rental-erd.excalidraw)
+2. **[Domain-Driven Design Implementation](./DDD-IMPLEMENTATION.md)** - Learn how business concepts become code
+   - Value objects vs entities - what's the difference?
+   - Domain services - where business logic lives
+   - How TypeSpec helps model business domains
 
-**Entity Relationship Diagram** - Visual representation of:
+### 🔄 **Then Explore: Business Processes**
 
-- All domain entities with color-coded categories
-- Relationships between entities (1:1, 1:many, many:many)
-- Key fields and data types
-- Business constraints and rules
+3. **[Workflow Documentation](./workflows/)** - See how business operations actually work
 
-### [`ddd-architecture.excalidraw`](./ddd-architecture.excalidraw)
+   - How do customers register?
+   - What happens during a video rental?
+   - How are overdue videos handled?
 
-**Domain Architecture Diagram** - Visual representation of:
+4. **[Workflow Interconnections](./workflows/00-workflow-interconnections.md)** - Understand the big picture
+   - How do different business processes depend on each other?
+   - Where are the integration points?
+   - What drives what in the system?
 
-- Layered architecture (API → Domain → Business Rules → Database)
-- Domain services, models, and value objects
-- Business rules implementation
-- Technical benefits and features
-- 32 API operations organized by functional area
+### 🎬 **Finally Experience: Interactive Flows**
+
+5. **[Sequence Diagrams](./sequence/)** - Watch the system in action
+   - Step-by-step customer interactions
+   - Error handling and edge cases
+   - How business rules get enforced in real scenarios
+
+- **Customer Registration**: Streamlined customer onboarding
+- **Video Catalog Management**: Content and metadata management
+- **Rental Creation**: Complete rental workflow with discount integration
+- **Return Processing**: Simplified condition handling
+- **Overdue Management**: Automated notification system
+- **Payment Processing**: Multi-type payment handling
+- **Inventory Management**: Copy lifecycle without maintenance complexity
 
 ## 🔧 How to View Diagrams
 
@@ -60,32 +71,43 @@ Entity Relationship documentation describing:
 
 ## 📊 Current Domain Stats
 
-- **Total Operations**: 32 across 21 endpoints in 7 functional areas
-- **Domain Models**: 8 core entities + shared PersonBase pattern
+- **Total Operations**: 25+ endpoints across 6 functional areas (simplified)
+- **Domain Models**: 5 core entities (removed PersonBase pattern)
 - **Value Objects**: 5 immutable business concepts
-- **Domain Services**: 2 business logic services
-- **Business Rules**: Comprehensive coverage of rental operations
+- **Domain Services**: 2 streamlined business logic services
+- **Business Rules**: Simplified rental operations focusing on core workflows
+- **Enum Simplification**: Reduced complexity with essential values only
 
 ## 🎯 Functional Areas
 
 1. **System** (2 operations) - Health monitoring and documentation
 2. **Videos** (6 operations) - Complete catalog management with CRUD operations
-3. **Customers** (7 operations) - Full customer lifecycle management
-4. **Rentals** (5 operations) - Core rental workflow operations with cancellation
-5. **Payments** (3 operations) - Financial transaction processing
-6. **Employees** (5 operations) - Complete staff management with CRUD operations
-7. **Inventory** (4 operations) - Physical copy lifecycle management
+3. **Customers** (5 operations) - Simplified customer lifecycle (no employee references)
+4. **Rentals** (5 operations) - Core rental workflow with customer discount integration
+5. **Payments** (4 operations) - Streamlined payment processing (4 payment types)
+6. **Inventory** (4+ operations) - Simplified copy management (Good/Defective only)
 
 ## 🏗️ Architecture Highlights
 
 - **API-First Development** with TypeSpec
-- **Pragmatic DDD** approach focusing on essential patterns
+- **Simplified Domain Model** with essential entities only
+- **Customer-Centric Design** removing employee complexity
+- **Streamlined Enums** for better usability
+- **Automatic Discount Application** via customer percentage field
 - **Type Safety** throughout the domain layer
 - **Clean Separation** between domain logic and infrastructure
-- **Comprehensive Validation** with business rule enforcement
+- **Comprehensive Validation** with simplified business rules
 - **Rich Documentation** auto-generated from TypeSpec definitions
+
+## 🔄 Recent Simplifications
+
+- **Removed PersonBase**: Folded fields directly into Customer entity
+- **Eliminated Employee References**: Customer-focused operations only
+- **Streamlined Enums**: CopyCondition (2 values), PaymentType (4 values)
+- **Simplified Workflows**: Removed complex branching and maintenance paths
+- **Enhanced Documentation**: Updated all diagrams and workflows
 
 ---
 
-_Last Updated: May 28, 2025_
-_All diagrams and documentation reflect the current domain implementation_
+_Last Updated: May 30, 2025_
+_All diagrams and documentation reflect the current simplified domain implementation_
