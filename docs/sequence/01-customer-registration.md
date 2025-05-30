@@ -1,6 +1,6 @@
 # Customer Registration Sequence Diagram
 
-This diagram shows the simplified customer registration workflow in the video rental system.
+This diagram illustrates the sequence of interactions for the simplified customer registration workflow in the video rental system.
 
 ## Sequence Flow
 
@@ -42,15 +42,15 @@ sequenceDiagram
     end
 ```
 
-## Key Points
+## Key Aspects of the Registration Process
 
-- **Simplified Process**: Direct customer creation without employee involvement
-- **Auto-Generated Fields**: System sets `id`, `memberSince`, and default `status`
-- **Optional Discount**: `discountPercentage` can be set later via admin operations
-- **Immediate Access**: Customer can start renting videos immediately after registration
-- **Validation**: Both client and server-side validation ensure data integrity
+- **Streamlined Process**: The customer registration process is designed for direct self-service, allowing users to create accounts without requiring intervention from system administrators or employees.
+- **System-Generated Fields**: Upon successful registration, the system automatically generates a unique `id` for the customer, sets the `memberSince` date to the current date, and assigns a default `status` (typically 'Active').
+- **Optional Discount Configuration**: The `discountPercentage` field, which determines eligibility for rental discounts, is not set during the initial registration. It can be configured at a later time through separate administrative operations.
+- **Immediate System Access**: Once the registration is complete and successful, customers gain immediate access to the system and can begin renting videos.
+- **Comprehensive Validation**: To ensure data integrity and adherence to business rules, validation of the provided information is performed on both the client-side (within the Frontend UI) and on the server-side (by the Rental API).
 
-## Status Transitions
+## Customer Status Transitions
 
 ```mermaid
 stateDiagram-v2
@@ -63,4 +63,4 @@ stateDiagram-v2
     Inactive --> Active: Admin reactivation
 ```
 
-The registration process creates customers in `Active` status, ready for immediate video rentals.
+Upon successful completion of the registration process, a new customer record is created with an `Active` status, enabling them to utilize the video rental services immediately.

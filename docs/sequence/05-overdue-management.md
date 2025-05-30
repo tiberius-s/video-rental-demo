@@ -1,6 +1,6 @@
 # Overdue Management Sequence Diagram
 
-This diagram shows the simplified overdue rental management workflow.
+This document describes the simplified workflow for managing overdue video rentals. The diagram below illustrates the automated daily process involving the System Scheduler, Rental API, Database, Notification Service, and the Customer.
 
 ## Sequence Flow
 
@@ -48,6 +48,8 @@ sequenceDiagram
 
 ## Overdue Status Management
 
+The state diagram below depicts the lifecycle of a rental's status as it transitions from active to overdue and eventually to returned.
+
 ```mermaid
 stateDiagram-v2
     [*] --> Active: Rental created
@@ -61,6 +63,8 @@ stateDiagram-v2
 ```
 
 ## Late Fee Calculation
+
+The flowchart below outlines the logic for calculating late fees. It considers the number of days a rental is overdue and the daily rental rate, while also noting that customer discounts do not apply to penalty fees.
 
 ```mermaid
 flowchart TD
@@ -80,6 +84,8 @@ flowchart TD
 ```
 
 ## Notification Content
+
+The mind map below details the information included in the overdue notification sent to customers. This ensures clarity regarding the overdue item, associated fees, and required actions.
 
 ```mermaid
 mindmap
@@ -103,23 +109,29 @@ mindmap
 
 ## Key Features
 
-1. **Automated Processing**: Daily batch job identifies overdue rentals
-2. **Progressive Fees**: Late fees calculated per day overdue
-3. **Customer Notifications**: Email alerts with detailed fee breakdown
-4. **Simplified Workflow**: Single notification type, no escalation tiers
-5. **Payment Integration**: Late fees automatically added to customer account
+The overdue management system includes the following key features:
+
+- **Automated Processing**: A daily batch job automatically identifies and processes overdue rentals.
+- **Progressive Fee Calculation**: Late fees are calculated based on the number of days a rental is overdue, ensuring fairness.
+- **Customer Notifications**: Automated email alerts are sent to customers, providing a detailed breakdown of overdue items and associated fees.
+- **Simplified Workflow**: The system employs a straightforward notification process without multiple escalation tiers for this simplified model.
+- **Payment Integration**: Calculated late fees are automatically added to the customer's account for future payment.
 
 ## Business Rules
 
-- **Daily Processing**: System runs overdue check once per day
-- **Late Fee Formula**: Days overdue × original daily rental rate
-- **Discount Policy**: Customer discounts don't apply to late fees
-- **Notification Timing**: Sent immediately when rental becomes overdue
-- **Status Persistence**: Rentals remain "Overdue" until returned
+The overdue management process is governed by the following business rules:
+
+- **Daily Processing Cycle**: The system performs the overdue check once every day.
+- **Late Fee Formula**: Late fees are determined by multiplying the number of days overdue by the original daily rental rate of the item.
+- **Discount Policy Adherence**: Customer discounts are not applicable to late fee penalties.
+- **Notification Trigger**: Notifications are dispatched as soon as a rental's status changes to overdue.
+- **Status Persistence**: A rental remains in the "Overdue" status until the item is returned by the customer.
 
 ## Error Handling
 
-- **Email Failures**: Logged for manual follow-up
-- **Database Errors**: Transaction rollback to prevent inconsistent state
-- **Calculation Errors**: Default to base rental rate for late fees
-- **Customer Account Issues**: Processing continues but flagged for review
+The system incorporates mechanisms to manage potential errors during overdue processing:
+
+- **Email Delivery Failures**: If an email notification fails to send, the event is logged for manual follow-up by staff.
+- **Database Transaction Errors**: In the event of database errors, transactions are rolled back to maintain data consistency and prevent an inconsistent state.
+- **Calculation Discrepancies**: If errors occur during late fee calculation, the system defaults to using the base rental rate to determine the fee, ensuring a charge is still applied.
+- **Customer Account Issues**: If issues related to a customer's account are detected, processing for that account continues, but the account is flagged for administrative review.

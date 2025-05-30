@@ -1,261 +1,261 @@
-# Learning Domain-Driven Design: A Practical Tutorial
+# Domain-Driven Design in Practice: A Tutorial
 
-Welcome to the hands-on implementation guide for Domain-Driven Design (DDD)! This document walks you through how we've applied DDD principles to build a video rental store, making complex business logic manageable and maintainable.
+Welcome to this practical guide on implementing Domain-Driven Design (DDD)! This document explains how we have applied DDD principles to construct a video rental store application, aiming to make complex business logic both manageable and maintainable.
 
-## Why We Chose This Approach
+## Our Approach to DDD
 
-Instead of jumping into abstract DDD theory, we'll explore how these patterns solve real problems in our video rental business. Each design decision demonstrates a core DDD principle in action.
+Rather than delving into abstract DDD theory, we will explore how these design patterns address real-world challenges within our video rental business. Each design choice is a demonstration of a core DDD principle in action.
 
-**What You'll Discover:**
+**What You Will Discover:**
 
-- How to organize business logic so it makes sense to both developers and domain experts
-- Why value objects and domain services matter for real applications
-- How to design APIs that reflect business operations, not just database CRUD
+- How to organize business logic in a way that is understandable to both developers and domain experts.
+- The practical importance of Value Objects and Domain Services in real applications.
+- How to design APIs that accurately reflect business operations, rather than just database CRUD (Create, Read, Update, Delete) actions.
 
-## Your Learning Journey Through the Domain
+## Your Learning Journey Through the Domain Model
 
-Let's explore how DDD principles shaped our code structure. Each section shows you both the "what" and the "why" behind our choices.
+Let’s examine how DDD principles have shaped our codebase. Each section will clarify both the "what" and the "why" behind our architectural decisions.
 
-### 🧩 Understanding Value Objects - The Building Blocks
+### 🧩 Understanding Value Objects: The Building Blocks
 
 **Location**: [`/models/value-objects/`](../packages/domain/lib/models/value-objects/)
 
-Value objects are concepts that matter to the business but don't have an identity. Think of them as the "building blocks" of your domain.
+Value Objects represent concepts that are important to the business but do not have a unique identity. Think of them as the fundamental "building blocks" of your domain.
 
-**Real Examples from Our Domain:**
+**Examples from Our Domain:**
 
-- **`Address`** - More than just text fields
+- **`Address`**: More than just text fields.
 
-  - _Business Rule_: Must be a valid US address with proper state codes
-  - _Why It Matters_: Billing and shipping addresses need to be accurate for our business
-  - _DDD Pattern_: Encapsulates validation so invalid addresses can't exist
+  - _Business Rule_: Must be a valid US address with correct state codes.
+  - _Why It Matters_: Accurate billing and shipping addresses are crucial for business operations.
+  - _DDD Pattern_: Encapsulates validation, ensuring that invalid addresses cannot exist in the system.
 
-- **`Email`** - Not just a string
+- **`Email`**: Not merely a string.
 
-  - _Business Rule_: Must follow RFC email format standards
-  - _Why It Matters_: We need to contact customers about overdue rentals
-  - _DDD Pattern_: Makes impossible states impossible - no invalid emails in our system
+  - _Business Rule_: Must adhere to RFC email format standards.
+  - _Why It Matters_: Reliable contact with customers is necessary, for instance, regarding overdue rentals.
+  - _DDD Pattern_: Makes invalid states impossible—no incorrect email formats in our system.
 
-- **`Money`** - Currency that actually works
+- **`Money`**: Currency representation that functions correctly.
 
-  - _Business Rule_: Decimal precision with proper currency codes
-  - _Why It Matters_: Rental fees, late charges, and refunds must be accurate
-  - _DDD Pattern_: Prevents floating-point math errors in financial calculations
+  - _Business Rule_: Requires decimal precision and proper currency codes.
+  - _Why It Matters_: Rental fees, late charges, and refunds must be calculated accurately.
+  - _DDD Pattern_: Prevents floating-point arithmetic errors in financial calculations.
 
-- **`RentalPeriod`** - Time spans with business meaning
-  - _Business Rule_: Start date, due date, and optional return date
-  - _Why It Matters_: Late fees depend on when movies are actually returned
-  - _DDD Pattern_: Encapsulates time-based business logic
+- **`RentalPeriod`**: Time spans with specific business meaning.
+  - _Business Rule_: Includes a start date, due date, and an optional return date.
+  - _Why It Matters_: Late fees are determined by when movies are actually returned.
+  - _DDD Pattern_: Encapsulates time-based business logic.
 
-**Learning Point**: Value objects aren't just data validation - they represent business concepts that domain experts talk about every day.
+**Learning Point**: Value Objects are not just for data validation; they represent business concepts that domain experts use daily.
 
-### 🎯 Domain Models - The Heart of Your Business
+### 🎯 Domain Models: The Heart of Your Business
 
 **Location**: [`/models/`](../packages/domain/lib/models/)
 
-These are the core "things" your business cares about. Each model represents something a domain expert would recognize and discuss.
+These are the core "things" that your business revolves around. Each model represents something a domain expert would recognize and discuss.
 
 **Business Entities in Our Store:**
 
-- **`Customer`** - The people who rent our videos
+- **`Customer`**: The individuals who rent our videos.
 
-  - _What Makes Them Special_: Discount eligibility, rental history, account status
-  - _Business Operations_: Can check eligibility, apply discounts, track rental limits
-  - _DDD Insight_: Customers aren't just database records - they have business behaviors
+  - _Key Characteristics_: Discount eligibility, rental history, account status.
+  - _Business Operations_: Can check eligibility, apply discounts, track rental limits.
+  - _DDD Insight_: Customers are more than just database records; they possess business-specific behaviors.
 
-- **`Video`** - The movies and shows in our catalog
+- **`Video`**: The movies and shows available in our catalog.
 
-  - _What Makes Them Special_: Pricing, genre classification, availability tracking
-  - _Business Operations_: Price calculation, availability checking, catalog management
-  - _DDD Insight_: Videos have business rules about pricing and availability
+  - _Key Characteristics_: Pricing, genre classification, availability tracking.
+  - _Business Operations_: Price calculation, availability checking, catalog management.
+  - _DDD Insight_: Videos have inherent business rules regarding pricing and availability.
 
-- **`Rental`** - The transaction at the core of our business
+- **`Rental`**: The transaction central to our business.
 
-  - _What Makes Them Special_: Period tracking, fee calculation, status management
-  - _Business Operations_: Late fee calculation, return processing, renewal handling
-  - _DDD Insight_: Rentals aren't just join tables - they're business processes
+  - _Key Characteristics_: Period tracking, fee calculation, status management.
+  - _Business Operations_: Late fee calculation, return processing, renewal handling.
+  - _DDD Insight_: Rentals are not just join tables; they represent business processes.
 
-- **`Inventory`** - Physical copies of videos
+- **`Inventory`**: The physical copies of videos.
 
-  - _What Makes Them Special_: Condition tracking, maintenance scheduling, availability
-  - _Business Operations_: Damage assessment, retirement decisions, copy management
-  - _DDD Insight_: Physical inventory has different rules than catalog videos
+  - _Key Characteristics_: Condition tracking, maintenance scheduling, availability.
+  - _Business Operations_: Damage assessment, retirement decisions, copy management.
+  - _DDD Insight_: Physical inventory items are subject to different rules than catalog videos.
 
-- **`Payment`** - Money changing hands
-  - _What Makes Them Special_: Multiple payment types, refund processing, audit trails
-  - _Business Operations_: Payment processing, refund calculations, financial reporting
-  - _DDD Insight_: Payments involve complex business rules beyond simple transactions
+- **`Payment`**: The exchange of money.
+  - _Key Characteristics_: Multiple payment types, refund processing, audit trails.
+  - _Business Operations_: Payment processing, refund calculations, financial reporting.
+  - _DDD Insight_: Payments involve complex business rules that go beyond simple transactions.
 
-**Learning Point**: Domain models contain behavior, not just data. They know how to do business operations that domain experts care about.
+**Learning Point**: Domain Models encapsulate behavior, not just data. They understand how to perform business operations relevant to domain experts.
 
-### 🔧 Domain Services - Business Logic That Doesn't Belong to One Entity
+### 🔧 Domain Services: Business Logic Beyond a Single Entity
 
 **Location**: [`/services/`](../packages/domain/lib/services/)
 
-Sometimes business logic involves multiple entities or complex calculations. Domain services handle these operations while keeping the business logic in the domain layer.
+Sometimes, business logic involves multiple entities or complex calculations. Domain Services handle these operations, keeping the business logic within the domain layer.
 
 **Our Business Logic Services:**
 
-- **`CustomerService`** - Customer-related business operations
+- **`CustomerService`**: Manages customer-related business operations.
 
-  - _What It Handles_: Eligibility checks, discount calculations, rental summaries
-  - _Why Separate_: These operations involve multiple entities (Customer + Rental + Payment)
-  - _Business Value_: Centralizes customer business rules so they stay consistent
+  - _Responsibilities_: Eligibility checks, discount calculations, rental summaries.
+  - _Why It's Separate_: These operations involve multiple entities (e.g., Customer, Rental, Payment).
+  - _Business Value_: Centralizes customer-specific business rules for consistency.
 
-- **`RentalService`** - Rental calculations and business rules
-  - _What It Handles_: Pricing with discounts, late fee calculations, rental period management
-  - _Why Separate_: Complex calculations involving Video + Customer + RentalPeriod + Money
-  - _Business Value_: Ensures pricing rules are applied consistently across all operations
+- **`RentalService`**: Handles rental calculations and associated business rules.
+  - _Responsibilities_: Pricing with discounts, late fee calculations, rental period management.
+  - _Why It's Separate_: Involves complex calculations using Video, Customer, RentalPeriod, and Money.
+  - _Business Value_: Ensures consistent application of pricing rules across all operations.
 
-**Learning Point**: Domain services keep complex business logic in the domain layer instead of leaking into controllers or database queries.
+**Learning Point**: Domain Services prevent complex business logic from leaking into controllers or database queries by keeping it within the domain layer.
 
-### 🎯 Pragmatic DDD - Principles Over Patterns
+### 🎯 Pragmatic DDD: Principles Over Patterns
 
-We've chosen a **pragmatic DDD approach** that focuses on solving real business problems without over-engineering.
+We have adopted a **pragmatic DDD approach**, focusing on solving real business problems without unnecessary over-engineering.
 
 **What We Include:**
 
-- **Domain Services** - Clear business logic encapsulation
-- **Value Objects** - Business concepts with validation and behavior
-- **Domain Models** - Entities that reflect business operations
-- **REST Operations** - API endpoints that match business workflows
+- **Domain Services**: For clear encapsulation of business logic.
+- **Value Objects**: Representing business concepts with built-in validation and behavior.
+- **Domain Models**: Entities that reflect actual business operations.
+- **REST Operations**: API endpoints designed to match business workflows.
 
-**What We Intentionally Skip:**
+**What We Intentionally Exclude (for now):**
 
-- **Complex CQRS** - Our read/write operations aren't complex enough yet
-- **Event Sourcing** - Standard CRUD meets our current business needs
-- **Aggregates** - Our entity relationships are straightforward
-- **Repository Patterns** - TypeSpec + database layer provides sufficient abstraction
+- **Complex CQRS (Command Query Responsibility Segregation)**: Our current read/write operations do not yet warrant this complexity.
+- **Event Sourcing**: Standard CRUD operations meet our present business needs.
+- **Aggregates**: Our entity relationships are currently straightforward.
+- **Repository Patterns**: The combination of TypeSpec and our database layer provides sufficient abstraction at this stage.
 
-**Learning Point**: DDD is about understanding your business domain, not implementing every pattern in the book. Start simple and add complexity only when business rules demand it.
+**Learning Point**: DDD is primarily about understanding your business domain, not about implementing every known pattern. Start simple and introduce complexity only when business rules require it.
 
-## Exploring Our API Design - Business Operations, Not CRUD
+## Exploring Our API Design: Business Operations, Not Just CRUD
 
 **Location**: [`/routes.tsp`](../packages/domain/lib/routes.tsp)
 
-Our API exposes **32 business operations** across **21 endpoints**. Notice how these match what people actually do in a video rental store, not just database operations.
+Our API exposes **32 distinct business operations** through **21 endpoints**. Notice how these align with the actual tasks performed in a video rental store, rather than merely reflecting database operations.
 
-### System Health - Keeping Things Running
+### System Health: Ensuring Operational Stability
 
-- `GET /health` - Is our store operational?
-- `GET /docs` - How do our systems work?
+- `GET /health`: "Is our store operational?"
+- `GET /docs`: "How do our systems work?"
 
-_Business Value_: Operations teams need to know if the store is working properly.
+_Business Value_: Operations teams need to monitor if the store is functioning correctly.
 
-### Video Catalog Management - What We Rent
+### Video Catalog Management: What We Offer for Rent
 
-- `POST /videos` - Add new movies to our catalog
-- `GET /videos` - Browse available movies (with search and filtering)
-- `GET /videos/{videoId}` - Get detailed movie information
-- `PATCH /videos/{videoId}` - Update movie details (price changes, etc.)
-- `GET /videos/{videoId}/availability` - How many copies are available right now?
-- `DELETE /videos/{videoId}` - Remove movies from catalog (discontinue)
+- `POST /videos`: "Add new movies to our catalog."
+- `GET /videos`: "Browse available movies" (with search and filtering capabilities).
+- `GET /videos/{videoId}`: "Get detailed information for a specific movie."
+- `PATCH /videos/{videoId}`: "Update movie details" (e.g., price changes).
+- `GET /videos/{videoId}/availability`: "How many copies of this movie are available right now?"
+- `DELETE /videos/{videoId}`: "Remove movies from the catalog" (discontinue offering).
 
-_Business Value_: Staff need to manage what movies we offer and customers need to browse and search.
+_Business Value_: Staff need to manage the movie selection, and customers need to browse and search effectively.
 
-### Customer Operations - Who Rents From Us
+### Customer Operations: Managing Our Renters
 
-- `POST /customers` - New customer registration
-- `GET /customers` - Find customers (for staff lookup)
-- `GET /customers/{customerId}` - Customer details and account status
-- `PATCH /customers/{customerId}` - Update customer information
-- `DELETE /customers/{customerId}` - Deactivate customer accounts
-- `GET /customers/{customerId}/eligibility` - Can this customer rent more videos?
-- `GET /customers/{customerId}/rentals` - Customer's rental history
+- `POST /customers`: "Register a new customer."
+- `GET /customers`: "Find customers" (for staff lookup purposes).
+- `GET /customers/{customerId}`: "View customer details and account status."
+- `PATCH /customers/{customerId}`: "Update customer information."
+- `DELETE /customers/{customerId}`: "Deactivate customer accounts."
+- `GET /customers/{customerId}/eligibility`: "Can this customer rent more videos?"
+- `GET /customers/{customerId}/rentals`: "View a customer's rental history."
 
-_Business Value_: Customer service operations and account management.
+_Business Value_: Supports customer service operations and account management.
 
-### Rental Operations - The Core Business Transaction
+### Rental Operations: The Core Business Transactions
 
-- `POST /rentals` - Rent a video (with eligibility and availability checks)
-- `GET /rentals/{rentalId}` - Look up rental details
-- `DELETE /rentals/{rentalId}` - Cancel rental (with refund processing)
-- `POST /rentals/{rentalId}/return` - Return video (with late fee calculation)
-- `GET /rentals/overdue` - Which rentals are overdue? (for follow-up)
+- `POST /rentals`: "Rent a video" (includes eligibility and availability checks).
+- `GET /rentals/{rentalId}`: "Look up details for a specific rental."
+- `DELETE /rentals/{rentalId}`: "Cancel a rental" (includes refund processing).
+- `POST /rentals/{rentalId}/return`: "Return a video" (includes late fee calculation).
+- `GET /rentals/overdue`: "Which rentals are currently overdue?" (for follow-up actions).
 
-_Business Value_: The fundamental operations that make money for our business.
+_Business Value_: These are the fundamental operations that generate revenue for the business.
 
-### Payment Processing - Money Management
+### Payment Processing: Managing Financial Transactions
 
-- `POST /payments` - Process payments for rentals and fees
-- `GET /payments/{paymentId}` - Payment transaction details
-- `GET /payments/customer/{customerId}` - Customer's payment history
+- `POST /payments`: "Process payments for rentals and fees."
+- `GET /payments/{paymentId}`: "View details of a specific payment transaction."
+- `GET /payments/customer/{customerId}`: "View a customer's complete payment history."
 
-_Business Value_: Financial operations and customer billing.
+_Business Value_: Facilitates financial operations and customer billing.
 
-### Inventory Management - Physical Copy Tracking
+### Inventory Management: Tracking Physical Copies
 
-- `POST /inventory` - Add new physical copies to inventory
-- `GET /inventory/video/{videoId}` - All physical copies of a specific movie
-- `PATCH /inventory/{inventoryId}` - Update copy condition/status
-- `DELETE /inventory/{inventoryId}` - Remove damaged or lost copies
+- `POST /inventory`: "Add new physical copies to the inventory."
+- `GET /inventory/video/{videoId}`: "List all physical copies of a specific movie."
+- `PATCH /inventory/{inventoryId}`: "Update the condition or status of a copy."
+- `DELETE /inventory/{inventoryId}`: "Remove damaged or lost copies from inventory."
 
-_Business Value_: Track physical assets and their condition.
+_Business Value_: Enables tracking of physical assets and their current condition.
 
-**Learning Point**: Our API reflects business operations, not database tables. Each endpoint represents something a domain expert would recognize as a business action.
+**Learning Point**: Our API is designed to reflect business operations, not database table structures. Each endpoint represents an action that a domain expert would recognize as a standard business activity.
 
-## Business Rules in Action - How Domain Logic Works
+## Business Rules in Action: How Domain Logic Is Implemented
 
-Let's see how DDD principles help us implement complex business rules clearly and maintainably.
+Let's examine how DDD principles facilitate the clear and maintainable implementation of complex business rules.
 
 ### Customer Discount Logic
 
 ```typescript
-// In CustomerService - business logic stays in the domain
+// Located in CustomerService – business logic remains within the domain.
 calculateRentalPrice(basePrice: Money, customerDiscount: number): Money {
-  // Business rule: Discounts are percentage-based
-  // Domain expert can verify this logic
+  // Business rule: Discounts are percentage-based.
+  // A domain expert can verify this logic.
   return basePrice.subtract(basePrice.multiply(customerDiscount / 100));
 }
 ```
 
-**Why This Works**: Domain experts can read and validate this logic. It matches how they think about discounts.
+**Why This Works**: Domain experts can easily read and validate this logic because it mirrors how they conceptualize discounts.
 
 ### Rental Eligibility Rules
 
 ```typescript
-// Complex business rules in domain service
+// Complex business rules are managed in a domain service.
 checkRentalEligibility(customer: Customer, inventory: Inventory[]): EligibilityResult {
-  // Business rule: No rentals if customer has overdue items
-  // Business rule: Rental limits based on customer status
-  // Business rule: Inventory must be available and in good condition
+  // Business rule: No rentals if a customer has overdue items.
+  // Business rule: Rental limits are based on customer status.
+  // Business rule: Inventory items must be available and in good condition.
 }
 ```
 
-**Why This Works**: All eligibility rules are centralized. When business rules change, there's one place to update.
+**Why This Works**: All eligibility rules are centralized. If business rules change, updates are made in a single, designated location.
 
 ### Late Fee Calculations
 
 ```typescript
-// RentalService handles time-based business logic
+// RentalService handles time-based business logic.
 calculateLateFee(rental: Rental, returnDate: Date): Money {
-  // Business rule: Late fees accrue daily after due date
-  // Business rule: Maximum late fee caps
-  // Business rule: Different rates for different video types
+  // Business rule: Late fees accrue daily after the due date.
+  // Business rule: There are maximum caps for late fees.
+  // Business rule: Different rates may apply for different types of videos.
 }
 ```
 
-**Why This Works**: Complex calculations stay in the domain where business experts can verify them.
+**Why This Works**: Complex calculations are kept within the domain, where business experts can verify their accuracy.
 
-## Technical Implementation - Making DDD Work
+## Technical Implementation: Making DDD Effective
 
 ### TypeSpec-Driven Development
 
-We use **TypeSpec** to define our domain models first, then generate everything else:
+We utilize **TypeSpec** to define our domain models first, subsequently generating all other necessary components.
 
-**Why This Matters:**
+**Why This Is Important:**
 
-- **API-First**: Business operations become HTTP endpoints automatically
-- **Type Safety**: Impossible to have mismatched APIs and domain models
-- **Documentation**: Business rules become API documentation
-- **Validation**: Domain constraints become runtime validation
+- **API-First Approach**: Business operations are automatically translated into HTTP endpoints.
+- **Type Safety**: Prevents mismatches between APIs and domain models.
+- **Living Documentation**: Business rules directly inform API documentation.
+- **Built-in Validation**: Domain constraints become runtime validation rules.
 
-### Composition Patterns That Make Sense
+### Sensible Composition Patterns
 
-**PersonBase Pattern**: Customer information reused across the system
+**`PersonBase` Pattern**: Customer information is reused consistently across the system.
 
 ```typescript
-// Shared pattern for personal information
+// Shared pattern for personal information.
 model PersonBase {
   firstName: string;
   lastName: string;
@@ -263,104 +263,101 @@ model PersonBase {
   // ... other personal details
 }
 
-// Customer extends this with business-specific fields
+// Customer extends PersonBase with business-specific fields.
 model Customer extends PersonBase {
-  discountPercentage?: number; // Business-specific
-  accountStatus: CustomerStatus; // Business-specific
+  discountPercentage?: number; // Business-specific field
+  accountStatus: CustomerStatus; // Business-specific field
 }
 ```
 
-**Why This Works**: Domain experts recognize "personal information" as a concept. We model it once and reuse it correctly.
+**Why This Works**: Domain experts recognize "personal information" as a distinct concept. We model it once and reuse it appropriately throughout the system.
 
-### Domain Validation - Business Rules as Code
+### Domain Validation: Business Rules as Code
 
-Our validation rules reflect business requirements:
+Our validation rules directly reflect business requirements:
 
-- **Address Validation**: Must be valid US addresses (business requirement)
-- **Email Validation**: RFC-compliant for reliable customer communication
-- **Phone Number Validation**: E.164 format for international compatibility
-- **Money Validation**: Decimal precision prevents financial calculation errors
-- **Business Logic Validation**: Rental periods, discount limits, inventory status
+- **Address Validation**: Must be valid US addresses (a business requirement).
+- **Email Validation**: Must be RFC-compliant for reliable customer communication.
+- **Phone Number Validation**: Adheres to E.164 format for international compatibility.
+- **Money Validation**: Ensures decimal precision to prevent financial calculation errors.
+- **Business Logic Validation**: Enforces rules for rental periods, discount limits, inventory status, etc.
 
-**Learning Point**: Validation isn't just preventing system errors - it's enforcing business rules that domain experts care about.
+**Learning Point**: Validation is not merely about preventing system errors; it is about enforcing the business rules that domain experts deem critical.
 
-## Architectural Benefits You'll Experience
+## Architectural Benefits You Will Experience
 
-### 1. Business Logic Clarity
+### 1. Clarity in Business Logic
 
-When business rules change, you know exactly where to look. Domain experts can read and verify the logic.
+When business rules change, the location for updates is clear. Domain experts can read and verify the logic.
 
-### 2. Type Safety Everywhere
+### 2. Comprehensive Type Safety
 
-Impossible to have mismatched APIs, databases, and domain models. TypeScript and TypeSpec ensure consistency.
+It becomes impossible to have mismatches between APIs, databases, and domain models. TypeScript and TypeSpec ensure consistency.
 
 ### 3. Maintainable Complexity
 
-As business rules grow more complex, the domain structure grows with them in predictable ways.
+As business rules become more complex, the domain structure evolves with them in a predictable and organized manner.
 
-### 4. Testing That Makes Sense
+### 4. Meaningful Testing
 
-Domain logic is isolated from infrastructure, making business rule testing straightforward.
+Domain logic is isolated from infrastructure concerns, making the testing of business rules straightforward.
 
-### 5. Documentation That Stays Current
+### 5. Consistently Current Documentation
 
-API documentation generates from domain models, so it's always accurate.
+API documentation is generated directly from domain models, ensuring it is always accurate and up-to-date.
 
 ### 6. Clear Integration Points
 
-Database layer, API layer, and business logic have clear boundaries and responsibilities.
+The database layer, API layer, and business logic have well-defined boundaries and responsibilities.
 
-## Domain Boundaries - What We Own
+## Defining Domain Boundaries: What We Own
 
-Our video rental domain includes:
+Our video rental domain encompasses:
 
-**Customer Management**: Everything about customer accounts, eligibility, and discounts
+- **Customer Management**: All aspects of customer accounts, eligibility, and discounts.
+- **Inventory Management**: Physical video copies, condition tracking, and availability.
+- **Rental Operations**: Core transaction processing and associated business rules.
+- **Financial Operations**: Payment processing, pricing, discounts, and fee calculations.
 
-**Inventory Management**: Physical video copies, condition tracking, and availability
+**What Lies Outside Our Domain**: Employee management, general store operations, supplier relationships, marketing campaigns.
 
-**Rental Operations**: The core transaction processing and business rules
+**Learning Point**: Clearly defined domain boundaries help you focus on what your business actually does, rather than attempting to cover every conceivable feature.
 
-**Financial Operations**: Payment processing, pricing, discounts, and fee calculations
-
-**What's Outside Our Domain**: Employee management, store operations, supplier relationships, marketing campaigns
-
-**Learning Point**: Domain boundaries help you focus on what your business actually does, not every possible feature.
-
-## Integration Architecture - How Everything Connects
+## Integration Architecture: How Components Connect
 
 ### Database Layer Integration
 
 ```typescript
-// Domain models drive database schema
+// Domain models drive the database schema.
 import { generateSqlSchema } from "@video-rental/domain/codegen";
-const schema = generateSqlSchema(); // Type-safe database operations
+const schema = generateSqlSchema(); // Enables type-safe database operations.
 ```
 
 ### API Layer Integration
 
 ```typescript
-// Domain contracts become HTTP endpoints
+// Domain contracts are transformed into HTTP endpoints.
 import { getOpenApiSpec } from "@video-rental/domain";
-const apiSpec = await getOpenApiSpec(); // Complete API specification
+const apiSpec = await getOpenApiSpec(); // Provides a complete API specification.
 ```
 
 ### Business Logic Integration
 
 ```typescript
-// Domain services provide business operations
+// Domain services provide access to business operations.
 import { CustomerService, RentalService } from "@video-rental/domain";
-// Use business logic without knowing implementation details
+// Utilize business logic without needing to know implementation details.
 ```
 
-**Learning Point**: Domain-first development means business logic drives everything else, not the other way around.
+**Learning Point**: A domain-first development approach means that business logic dictates the design of other components, not the reverse.
 
-## Your DDD Learning Path
+## Your DDD Learning Path Continues
 
-Now that you understand our domain structure:
+Now that you have a better understanding of our domain structure:
 
-1. **Explore the Code**: Look at [`packages/domain/lib/`](../packages/domain/lib/) to see these patterns in action
-2. **Try Modifications**: Add a new business rule and see how it propagates through the system
-3. **Build Something**: Use our domain patterns to create new business operations
-4. **Test Business Logic**: Write tests for domain services to validate business rules
+1. **Explore the Code**: Examine the files in [`packages/domain/lib/`](../packages/domain/lib/) to see these patterns implemented.
+2. **Try Modifications**: Attempt to add a new business rule and observe how it propagates through the system.
+3. **Build Something New**: Use our established domain patterns to create new business operations.
+4. **Test Business Logic**: Write tests for domain services to validate the correctness of business rules.
 
-This pragmatic DDD implementation gives you a solid foundation for understanding how business domains become maintainable software architecture. The patterns scale with your business complexity while keeping the code understandable to both developers and domain experts.
+This pragmatic implementation of DDD provides a solid foundation for understanding how business domains can be translated into maintainable software architecture. These patterns are designed to scale with your business's complexity while keeping the code understandable for both developers and domain experts.

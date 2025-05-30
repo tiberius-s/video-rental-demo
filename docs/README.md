@@ -1,111 +1,116 @@
 # Learning Domain-Driven Design Through Diagrams
 
-Welcome to the visual learning center! This folder contains diagrams and documentation that teach Domain-Driven Design concepts through a familiar business domain - video rental.
+Welcome to the visual learning center! This folder contains diagrams and documentation designed to teach Domain-Driven Design (DDD) concepts using the familiar business domain of a video rental store.
 
 ## Why Start Here?
 
-Before diving into code, it's helpful to understand the business domain visually. These diagrams answer fundamental questions:
+Before diving into the codebase, it is beneficial to understand the business domain visually. These diagrams and documents aim to answer fundamental questions such as:
 
-- **What does the business do?** (Entity relationships and workflows)
-- **How do the pieces fit together?** (System architecture and dependencies)
-- **What happens when customers interact with the system?** (Sequence diagrams)
+- What are the core activities and components of the business? (Illustrated by entity relationships and workflows)
+- How do the various parts of the system interact and depend on each other? (Explained through system architecture and dependency descriptions)
+- What are the typical sequences of events when customers interact with the system? (Detailed in sequence diagrams)
 
-Think of this as your business analysis before writing any code.
+Consider this section as a preparatory business analysis phase before you begin coding.
 
 ## Your Learning Path
 
-### 🌱 **Start Here: Understanding the Business**
+### 🌱 **Start Here: Understanding the Business Domain**
 
-1. **[Entity Relationship Diagram](./ERD.md)** - See the core business entities and how they relate
+1. **[Entity Relationship Diagram](./ERD.md)**: This diagram illustrates the core business entities and their interrelationships.
 
-   - What is a Customer? A Video? A Rental?
-   - How does money flow through the system?
-   - What business rules govern these relationships?
+   - What defines a `Customer`, a `Video`, or a `Rental`?
+   - How is financial information managed within the system?
+   - What specific business rules govern these relationships?
 
-2. **[Domain-Driven Design Implementation](./DDD-IMPLEMENTATION.md)** - Learn how business concepts become code
-   - Value objects vs entities - what's the difference?
-   - Domain services - where business logic lives
-   - How TypeSpec helps model business domains
+2. **[Domain-Driven Design Implementation](./DDD-IMPLEMENTATION.md)**: This document explains how abstract business concepts are translated into concrete code structures.
+   - What is the distinction between Value Objects and Entities?
+   - Where is the primary business logic located (i.e., Domain Services)?
+   - How does TypeSpec facilitate the modeling of business domains?
 
-### 🔄 **Then Explore: Business Processes**
+### 🔄 **Then Explore: Business Processes and Workflows**
 
-1. **[Workflow Documentation](./workflows/)** - See how business operations actually work
+1. **[Workflow Documentation](./workflows/)**: Explore detailed diagrams illustrating how key business operations are executed.
 
-   - How do customers register?
-   - What happens during a video rental?
-   - How are overdue videos handled?
+   - How do new customers register an account?
+   - What are the steps involved in renting a video?
+   - How does the system handle overdue video returns?
 
-2. **[Workflow Interconnections](./workflows/00-workflow-interconnections.md)** - Understand the big picture
-   - How do different business processes depend on each other?
-   - Where are the integration points?
-   - What drives what in the system?
+2. **[Workflow Interconnections](./workflows/00-workflow-interconnections.md)**: This diagram provides a high-level overview of how different business processes are interconnected.
+   - How do various business processes depend on one another?
+   - What are the key integration points between different workflows?
+   - What are the primary drivers and triggers within the system?
 
-### 🎬 **Finally Experience: Interactive Flows**
+### 🎬 **Finally Experience: Interactive System Flows**
 
-1. **[Sequence Diagrams](./sequence/)** - Watch the system in action
-   - Step-by-step customer interactions
-   - Error handling and edge cases
-   - How business rules get enforced in real scenarios
+1. **[Sequence Diagrams](./sequence/)**: These diagrams provide a step-by-step visualization of system interactions for various scenarios.
 
-- **Customer Registration**: Streamlined customer onboarding
-- **Video Catalog Management**: Content and metadata management
-- **Rental Creation**: Complete rental workflow with discount integration
-- **Return Processing**: Simplified condition handling
-- **Overdue Management**: Automated notification system
-- **Payment Processing**: Multi-type payment handling
-- **Inventory Management**: Copy lifecycle without maintenance complexity
+   - Observe detailed customer interaction flows.
+   - Understand how error conditions and edge cases are managed.
+   - See how business rules are enforced in practical scenarios.
+
+   Key scenarios include:
+
+   - **Customer Registration**: A streamlined process for onboarding new customers.
+   - **Video Catalog Management**: Procedures for managing video content and metadata.
+   - **Rental Creation**: The complete workflow for renting a video, including the integration of customer discounts.
+   - **Return Processing**: Simplified handling of video returns and condition assessment.
+   - **Overdue Management**: An automated system for notifying customers about overdue rentals.
+   - **Payment Processing**: Handling of various payment types for rentals and fees.
+   - **Inventory Management**: Managing the lifecycle of individual video copies, focusing on core availability and condition tracking.
 
 ## 🔧 How to View Diagrams
 
+Mermaid diagrams are rendered directly in Markdown. For Excalidraw files (if any are added later):
+
 ### In VS Code
 
-1. Install the [Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
-2. Click on any `.excalidraw` file to open it in the visual editor
-3. Edit, modify, or export diagrams as needed
+1. Install the [Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor).
+2. Click on any `.excalidraw` file to open it in the visual editor.
+3. You can then edit, modify, or export diagrams as needed.
 
 ### In Browser
 
-1. Go to [excalidraw.com](https://excalidraw.com)
-2. Click "Open" and select the `.excalidraw` file
-3. View and edit the diagram online
+1. Navigate to [excalidraw.com](https://excalidraw.com).
+2. Click "Open" and select the `.excalidraw` file from your local system.
+3. View and edit the diagram directly in your web browser.
 
-## 📊 Current Domain Stats
+## 📊 Current Domain Statistics (Simplified Model)
 
-- **Total Operations**: 25+ endpoints across 6 functional areas (simplified)
-- **Domain Models**: 5 core entities (removed PersonBase pattern)
-- **Value Objects**: 5 immutable business concepts
-- **Domain Services**: 2 streamlined business logic services
-- **Business Rules**: Simplified rental operations focusing on core workflows
-- **Enum Simplification**: Reduced complexity with essential values only
+- **Total Operations**: Over 25 API endpoints distributed across 6 primary functional areas.
+- **Domain Models**: 5 core entities (the `PersonBase` pattern has been removed for simplification).
+- **Value Objects**: 5 immutable objects representing fundamental business concepts.
+- **Domain Services**: 2 streamlined services encapsulating core business logic.
+- **Business Rules**: Simplified rental operations focusing on essential workflows.
+- **Enum Simplification**: Reduced complexity with only essential values for enumerated types.
 
 ## 🎯 Functional Areas
 
-1. **System** (2 operations) - Health monitoring and documentation
-2. **Videos** (6 operations) - Complete catalog management with CRUD operations
-3. **Customers** (5 operations) - Simplified customer lifecycle (no employee references)
-4. **Rentals** (5 operations) - Core rental workflow with customer discount integration
-5. **Payments** (4 operations) - Streamlined payment processing (4 payment types)
-6. **Inventory** (4+ operations) - Simplified copy management (Good/Defective only)
+1. **System** (2 operations): Provides health monitoring and access to documentation.
+2. **Videos** (6 operations): Manages the video catalog, including full CRUD (Create, Read, Update, Delete) capabilities.
+3. **Customers** (5 operations): Handles the customer lifecycle (simplified, with no employee-related references).
+4. **Rentals** (5 operations): Manages the core rental workflow, including integration with customer discount policies.
+5. **Payments** (4 operations): Processes payments for various transaction types (supporting 4 distinct payment types).
+6. **Inventory** (4+ operations): Manages individual video copies (simplified to `Good` or `Defective` conditions only).
 
 ## 🏗️ Architecture Highlights
 
-- **API-First Development** with TypeSpec
-- **Simplified Domain Model** with essential entities only
-- **Customer-Centric Design** removing employee complexity
-- **Streamlined Enums** for better usability
-- **Automatic Discount Application** via customer percentage field
-- **Type Safety** throughout the domain layer
-- **Clean Separation** between domain logic and infrastructure
-- **Comprehensive Validation** with simplified business rules
-- **Rich Documentation** auto-generated from TypeSpec definitions
+- **API-First Development**: Utilizes TypeSpec for defining and designing APIs prior to implementation.
+- **Simplified Domain Model**: Focuses on essential entities to reduce complexity.
+- **Customer-Centric Design**: Prioritizes customer interactions and removes complexities related to internal employee roles.
+- **Streamlined Enums**: Employs simplified enumerated types for improved clarity and usability.
+- **Automatic Discount Application**: Discounts are automatically applied based on the `discountPercentage` field in the `Customer` entity.
+- **Type Safety**: Ensures type consistency and safety throughout the domain layer.
+- **Clean Separation of Concerns**: Maintains a clear distinction between domain logic and infrastructure components.
+- **Comprehensive Validation**: Implements validation based on simplified business rules.
+- **Rich Documentation**: API documentation is auto-generated from TypeSpec definitions.
 
 ## 🔄 Recent Simplifications
 
-- **Removed PersonBase**: Folded fields directly into Customer entity
-- **Eliminated Employee References**: Customer-focused operations only
-- **Streamlined Enums**: CopyCondition (2 values), PaymentType (4 values)
-- **Simplified Workflows**: Removed complex branching and maintenance paths
-- **Enhanced Documentation**: Updated all diagrams and workflows
+- **Removed `PersonBase`**: Integrated fields directly into the `Customer` entity for a flatter structure.
+- **Eliminated Employee References**: Focused operations solely on customer-facing interactions.
+- **Streamlined Enums**: Simplified `CopyCondition` (to 2 values) and `PaymentType` (to 4 values).
+- **Simplified Workflows**: Removed complex branching logic and paths related to maintenance or less common scenarios.
+- **Enhanced Documentation**: Updated all diagrams and textual documentation to reflect the current, simplified domain model.
 
 ---
 
