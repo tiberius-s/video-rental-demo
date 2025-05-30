@@ -12,7 +12,7 @@ sequenceDiagram
     participant API as Rental API
     participant IDB as Inventory Service
     participant PDB as Pricing Service
-    parameter DB as Database
+    participant DB as Database
 
     note over C, DB: Simplified Video Return Processing
 

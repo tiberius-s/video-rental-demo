@@ -31,13 +31,13 @@ This folder contains sequence diagrams that demonstrate the key workflows in the
 
 ### Automated Workflows
 
-5. **[Overdue Management](05-overdue-management.md)**
+1. **[Overdue Management](05-overdue-management.md)**
 
    - Daily automated overdue checking
    - Late fee calculation
    - Customer notification system
 
-6. **[Inventory Management](06-inventory-management.md)**
+2. **[Inventory Management](06-inventory-management.md)**
    - Copy lifecycle management
    - Damage handling and retirement
    - Reporting and analytics

@@ -9,7 +9,7 @@ sequenceDiagram
     participant C as Customer
     participant S as Store Staff
     participant UI as POS System
-    parameter API as Payment API
+    participant API as Payment API
     participant PG as Payment Gateway
     participant DB as Database
     participant PS as Payment Processor

@@ -29,20 +29,20 @@ Think of this as your business analysis before writing any code.
 
 ### 🔄 **Then Explore: Business Processes**
 
-3. **[Workflow Documentation](./workflows/)** - See how business operations actually work
+1. **[Workflow Documentation](./workflows/)** - See how business operations actually work
 
    - How do customers register?
    - What happens during a video rental?
    - How are overdue videos handled?
 
-4. **[Workflow Interconnections](./workflows/00-workflow-interconnections.md)** - Understand the big picture
+2. **[Workflow Interconnections](./workflows/00-workflow-interconnections.md)** - Understand the big picture
    - How do different business processes depend on each other?
    - Where are the integration points?
    - What drives what in the system?
 
 ### 🎬 **Finally Experience: Interactive Flows**
 
-5. **[Sequence Diagrams](./sequence/)** - Watch the system in action
+1. **[Sequence Diagrams](./sequence/)** - Watch the system in action
    - Step-by-step customer interactions
    - Error handling and edge cases
    - How business rules get enforced in real scenarios

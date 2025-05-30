@@ -25,14 +25,14 @@ erDiagram
         PhoneNumber phoneNumber "E.164 format"
         decimal discountPercentage "0-100 nullable"
         string memberSince "Date format"
-        CustomerStatus status "Active~Suspended~Inactive"
+        CustomerStatus status "Active|Suspended|Inactive"
     }
 
     Video {
         string id PK "UUID"
         string title "Required 1-255 chars"
         string genre "Movie category"
-        string rating "G~PG~PG-13~R~NC-17"
+        string rating "G|PG|PG-13|R|NC-17"
         int32 releaseYear "Year published"
         int32 duration "Runtime in minutes"
         string description "Movie synopsis"
@@ -46,8 +46,8 @@ erDiagram
         string id PK "UUID"
         string videoId FK "References Video"
         string copyId "Physical identifier"
-        CopyCondition condition "Good~Defective"
-        CopyStatus status "Available~Rented~Retired"
+        CopyCondition condition "Good|Defective"
+        CopyStatus status "Available|Rented|Retired"
         string dateAcquired "Date format"
         string lastRentedDate "Nullable date"
     }
@@ -57,10 +57,10 @@ erDiagram
         string customerId FK "References Customer"
         string videoId FK "References Video"
         string inventoryId FK "Specific copy"
-        RentalPeriod period "Start~Due~Return dates"
+        RentalPeriod period "Start|Due|Return dates"
         Money rentalFee "Amount charged"
         Money lateFee "Nullable late charges"
-        RentalStatus status "Active~Returned~Overdue~Cancelled~Extended"
+        RentalStatus status "Active|Returned|Overdue|Cancelled|Extended"
     }
 
     Payment {
@@ -68,11 +68,11 @@ erDiagram
         string customerId FK "References Customer"
         string rentalId FK "Nullable rental ref"
         Money amount "Amount with currency"
-        PaymentType paymentType "Rental~LateFee~Damage~Membership"
-        PaymentMethod paymentMethod "Cash~CreditCard~DebitCard~Check~GiftCard"
+        PaymentType paymentType "Rental|LateFee|Damage|Membership"
+        PaymentMethod paymentMethod "Cash|CreditCard|DebitCard|Check|GiftCard"
         string paymentDate "DateTime format"
         string referenceNumber "Nullable transaction ref"
-        PaymentStatus status "Completed~Pending~Failed~Refunded~Cancelled"
+        PaymentStatus status "Completed|Pending|Failed|Refunded|Cancelled"
     }
 
     %% Relationship definitions with clear cardinality
@@ -80,13 +80,13 @@ erDiagram
     Customer ||--o{ Payment : "makes"
     Video ||--o{ Inventory : "has_copies"
     Video ||--o{ Rental : "rented_as"
-    Inventory }|--|| Video : "copy_of"
+    Inventory ||--|| Video : "copy_of"
     Inventory ||--o| Rental : "specific_copy"
-    Rental }|--|| Customer : "rented_by"
-    Rental }|--|| Video : "rents"
+    Rental ||--|| Customer : "rented_by"
+    Rental ||--|| Video : "rents"
     Rental ||--o{ Payment : "generates"
-    Payment }|--|| Customer : "paid_by"
-    Payment }|--o| Rental : "for_rental"
+    Payment ||--|| Customer : "paid_by"
+    Payment ||--o| Rental : "for_rental"
 ```
 
 ## Business Rules and Constraints
