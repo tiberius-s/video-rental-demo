@@ -278,6 +278,60 @@ Run these from the root or use `--workspace @video-rental/domain`:
   npm run <script-name> --workspace @video-rental/some-package
   ```
 
+## 🏗️ Monorepo Best Practices
+
+This project follows modern monorepo best practices for maintainability and developer experience.
+
+### Workspace Configuration
+
+- **Consistent Versioning**: All packages maintain the same version (0.0.1)
+- **Workspace Dependencies**: Internal packages use `workspace:*` protocol
+- **Shared Configuration**: Common TypeScript, ESLint, and Prettier configs
+- **Build Order**: Packages build in dependency order (domain → db → api)
+
+### Development Workflow
+
+```bash
+# Validate workspace configuration
+npm run workspace:validate
+
+# Build all packages in correct order
+npm run build
+
+# Run tests across all packages
+npm test
+
+# Development modes for specific packages
+npm run dev              # TypeSpec watching (domain)
+npm run dev:api          # API server development
+npm run dev:db           # Database development
+```
+
+### VS Code Integration
+
+The project includes comprehensive VS Code configuration:
+
+- **Tasks** (`.vscode/tasks.json`): Pre-configured build, test, and development tasks
+- **Launch** (`.vscode/launch.json`): Debug configurations for API server and tests
+- **Settings** (`.vscode/settings.json`): Optimized TypeScript, ESLint, and Prettier settings
+
+### Package Management
+
+- **Internal Dependencies**: Use `workspace:*` for cross-package dependencies
+- **Consistent Scripts**: All packages implement common scripts (build, clean, test, lint, format, typecheck)
+- **Shared DevDependencies**: Common tools like TypeScript, ESLint in root package
+- **Workspace Validation**: Automated checks for configuration consistency
+
+### Configuration Files
+
+| File                            | Purpose                         |
+| ------------------------------- | ------------------------------- |
+| `.npmrc`                        | Workspace-specific npm settings |
+| `tsconfig.json`                 | Base TypeScript configuration   |
+| `eslint.config.js`              | Shared linting rules            |
+| `.vscode/`                      | VS Code workspace configuration |
+| `scripts/validate-workspace.js` | Workspace health checks         |
+
 ## Documentation Deep Dive
 
 This project includes extensive documentation to help you understand the "why" behind the "how."

@@ -1,0 +1,14 @@
+- this project is an npm workspace
+- each package is an ES module
+- TypeScript is used for type safety and development
+- as a workspace, I expect best practices for package management and working configurations across all packages
+- package/domain contains the domain model and TypeSpec definitions
+- package/api contains the API implementation
+- docs contains the documentation and diagrams
+- when writing and running scripts, create a node script file with the logic and run it via npm with the tsx loader
+- when refactoring, I expect you to maintain the same functionality and improve the code quality
+- avoid writing or invoking scripts with `node -e`
+- you don't need to compile the tsp for testing unless a tsp file is modified
+- when you create test or backup files, I want those deleted at the end
+- project was put together with node 22, so use the best modern methods when called for
+- use the native test framework, 'node:test' for unit tests, and combine 'node:test' with fetch when functional tests are needed for the API

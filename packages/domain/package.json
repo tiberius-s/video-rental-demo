@@ -1,6 +1,6 @@
 {
   "name": "@video-rental/domain",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "type": "module",
   "author": "Tiberius Silivestru <tiberius.silivestru@gmail.com>",
   "license": "MIT",
@@ -27,6 +27,7 @@
     "build:ts": "tsc",
     "build:tsp": "tsp compile . --warn-as-error --import @typespec/library-linter",
     "clean": "rm -rf dist *.tsbuildinfo tsp-output/",
+    "typecheck": "tsc --noEmit",
     "tsp:compile": "tsp compile .",
     "tsp:watch": "tsp compile . --watch",
     "tsp:format": "tsp format lib/**/*.tsp",
@@ -36,6 +37,7 @@
     "lint:oas": "npx @redocly/cli@latest lint tsp-output/@typespec/openapi3/openapi.json",
     "format": "prettier \"src/**/*.ts\" \"lib/**/*.tsp\" --write",
     "format:check": "prettier \"src/**/*.ts\" \"lib/**/*.tsp\" --check",
+    "test": "echo 'No tests defined for domain package - placeholder for future custom linters/decorators'",
     "docs:generate": "npm run build:tsp && echo 'OpenAPI spec generated in tsp-output/@typespec/openapi3/openapi.json'",
     "dev": "npm run tsp:watch"
   }

@@ -1,16 +1,37 @@
 import SQLite, { type Database, type Statement } from "better-sqlite3";
 
+export interface DbClientOptions {
+  skipPragmaSetup?: boolean;
+}
+
+export interface DatabaseInfo {
+  memory: boolean;
+  readonly: boolean;
+  name: string;
+}
+
+const MEMORY_DB_NAME = ":memory:";
+const MEMORY_MAP_SIZE = 268435456; // 256MB
+const CACHE_SIZE = -64000; // 64MB
+const BUSY_TIMEOUT = 5000;
+
+/**
+ * A high-level client for SQLite database operations with optimized performance settings.
+ */
 export class DbClient {
   readonly #db: Database;
-  constructor(dbName = ":memory:") {
+
+  constructor(dbName = MEMORY_DB_NAME, options: DbClientOptions = {}) {
     this.#db = new SQLite(dbName);
-    // Only set WAL mode for file databases, in-memory databases use "memory" mode
-    if (dbName !== ":memory:") {
-      this.#db.pragma("journal_mode = WAL");
+
+    if (!options.skipPragmaSetup) {
+      this.#setupPragmas(dbName);
     }
   }
 
-  close() {
+  // Core Operations
+
+  close(): void {
     this.#db.close();
   }
 
@@ -22,105 +43,131 @@ export class DbClient {
     return this.#db.prepare(sql);
   }
 
+  // Statement Execution
+
   run(stmt: Statement, params?: unknown[]): SQLite.RunResult {
     return params ? stmt.run(params) : stmt.run();
   }
 
-  // Additional suggested operations:
-
-  // Get a single row
   get<T = unknown>(stmt: Statement, params: unknown[] = []): T | undefined {
     return stmt.get(params) as T | undefined;
   }
 
-  // Get all rows
   all<T = unknown>(stmt: Statement, params: unknown[] = []): T[] {
     return stmt.all(params) as T[];
   }
 
-  // Transaction support
-  transaction<T>(fn: () => T): T {
-    const txn = this.#db.transaction(fn);
-    return txn();
-  }
+  // Query Helpers
 
-  // Begin transaction manually
-  begin(): void {
-    this.#db.exec("BEGIN");
-  }
-
-  // Commit transaction
-  commit(): void {
-    this.#db.exec("COMMIT");
-  }
-
-  // Rollback transaction
-  rollback(): void {
-    this.#db.exec("ROLLBACK");
-  }
-
-  // Check if database is open
-  get isOpen(): boolean {
-    return this.#db.open;
-  }
-
-  // Get database info
-  getDatabaseInfo(): {
-    memory: boolean;
-    readonly: boolean;
-    name: string;
-  } {
-    return {
-      memory: this.#db.memory,
-      readonly: this.#db.readonly,
-      name: this.#db.memory ? "" : this.#db.name, // Return empty string for in-memory databases
-    };
-  }
-
-  // Backup database
-  async backup(destinationPath: string): Promise<void> {
-    await this.#db.backup(destinationPath);
-  }
-
-  // Set pragma values
-  pragma<T = unknown>(name: string, value?: string | number | boolean): T {
-    if (value !== undefined) {
-      return this.#db.pragma(`${name} = ${value}`) as T;
-    }
-    const result = this.#db.pragma(name);
-
-    // Check if the pragma is invalid (SQLite returns empty array for unknown pragmas)
-    if (Array.isArray(result) && result.length === 0) {
-      throw new Error(`Unknown pragma: ${name}`);
-    }
-
-    // Extract the value from the result array if it's an array
-    if (
-      Array.isArray(result) &&
-      result.length > 0 &&
-      typeof result[0] === "object" &&
-      result[0] !== null
-    ) {
-      return (result[0] as Record<string, unknown>)[name] as T;
-    }
-    return result as T;
-  }
-
-  // Convenience method for simple queries
   query<T = unknown>(sql: string, params: unknown[] = []): T[] {
     const stmt = this.prepare(sql);
     return this.all<T>(stmt, params);
   }
 
-  // Convenience method for single row queries
   queryOne<T = unknown>(sql: string, params: unknown[] = []): T | undefined {
     const stmt = this.prepare(sql);
     return this.get<T>(stmt, params);
   }
 
-  // Execute and return run result
   execute(sql: string, params: unknown[] = []): SQLite.RunResult {
     const stmt = this.prepare(sql);
     return this.run(stmt, params);
+  }
+
+  // Transactions
+
+  transaction<T>(fn: () => T): T {
+    const txn = this.#db.transaction(fn);
+    return txn();
+  }
+
+  begin(): void {
+    this.#db.exec("BEGIN");
+  }
+
+  commit(): void {
+    this.#db.exec("COMMIT");
+  }
+
+  rollback(): void {
+    this.#db.exec("ROLLBACK");
+  }
+
+  // Database Info & Utilities
+
+  get isOpen(): boolean {
+    return this.#db.open;
+  }
+
+  getDatabaseInfo(): DatabaseInfo {
+    return {
+      memory: this.#db.memory,
+      readonly: this.#db.readonly,
+      name: this.#db.memory ? "" : this.#db.name,
+    };
+  }
+
+  async backup(destinationPath: string): Promise<void> {
+    await this.#db.backup(destinationPath);
+  }
+
+  pragma<T = unknown>(name: string, value?: string | number | boolean): T {
+    if (value !== undefined) {
+      return this.#db.pragma(`${name} = ${value}`) as T;
+    }
+
+    const result = this.#db.pragma(name);
+
+    if (Array.isArray(result) && result.length === 0) {
+      throw new Error(`Unknown pragma: ${name}`);
+    }
+
+    if (this.#isPragmaResultObject(result, name)) {
+      const resultArray = result as Record<string, unknown>[];
+      return resultArray[0][name] as T;
+    }
+
+    return result as T;
+  }
+
+  // Private Methods
+
+  #setupPragmas(dbName: string): void {
+    this.#setEssentialPragmas();
+
+    if (this.#isFileDatabase(dbName)) {
+      this.#setFileOptimizations();
+    }
+  }
+
+  #setEssentialPragmas(): void {
+    this.#db.pragma("foreign_keys = ON");
+    this.#db.pragma(`busy_timeout = ${BUSY_TIMEOUT}`);
+  }
+
+  #setFileOptimizations(): void {
+    const currentJournalMode = this.#db.pragma("journal_mode", { simple: true }) as string;
+
+    if (currentJournalMode.toLowerCase() !== "wal") {
+      this.#db.pragma("journal_mode = WAL");
+    }
+
+    this.#db.pragma("temp_store = MEMORY");
+    this.#db.pragma(`mmap_size = ${MEMORY_MAP_SIZE}`);
+    this.#db.pragma(`cache_size = ${CACHE_SIZE}`);
+  }
+
+  #isFileDatabase(dbName: string): boolean {
+    return dbName !== MEMORY_DB_NAME;
+  }
+
+  #isPragmaResultObject(result: unknown, name: string): result is Record<string, unknown>[] {
+    return (
+      Array.isArray(result) &&
+      result.length > 0 &&
+      typeof result[0] === "object" &&
+      result[0] !== null &&
+      name in (result[0] as Record<string, unknown>)
+    );
   }
 }

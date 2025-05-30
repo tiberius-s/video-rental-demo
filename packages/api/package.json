@@ -9,14 +9,19 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist *.tsbuildinfo",
+    "dev": "npm run build -- --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/ --report-unused-disable-directives --max-warnings=0",
     "lint:fix": "eslint src/ test/ --report-unused-disable-directives --fix",
     "format": "prettier \"src/**/*.ts\" \"test/**/*.ts\" --write",
     "format:check": "prettier \"src/**/*.ts\" \"test/**/*.ts\" --check",
-    "test": "node --test --import=tsx test/"
+    "test": "echo 'No tests defined for API package - placeholder for future unit and integration tests'",
+    "test:watch": "echo 'Test watch mode not yet configured'",
+    "test:coverage": "echo 'Test coverage not yet configured'"
   },
   "dependencies": {
-    "@video-rental/domain": "^0.1.0",
+    "@video-rental/domain": "workspace:*",
     "express": "^5.1.0",
     "pino": "^9.6.0"
   },

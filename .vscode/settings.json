@@ -1,0 +1,42 @@
+{
+  // TypeScript Configuration
+  "typescript.preferences.enableProjectDiagnostics": true,
+  "typescript.preferences.includeOnlyTypeScriptFiles": false,
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.suggest.autoImports": true,
+  "typescript.suggest.paths": true,
+
+  // Editor Configuration
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  // ESLint Configuration
+  "eslint.workingDirectories": ["packages/domain", "packages/api", "packages/db"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+
+  // File Explorer
+  "files.exclude": {
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/*.tsbuildinfo": true,
+    "**/tsp-output": true
+  },
+
+  // Search Configuration
+  "search.exclude": {
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/tsp-output": true
+  },
+
+  // npm Configuration
+  "npm.enableRunFromFolder": true,
+  "npm.packageManager": "npm",
+
+  // Terminal Configuration
+  "terminal.integrated.defaultProfile.osx": "zsh"
+}
