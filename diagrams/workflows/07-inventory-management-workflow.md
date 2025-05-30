@@ -2,14 +2,13 @@
 
 ## Overview
 
-Physical copy tracking and maintenance workflow managing individual video copies with condition monitoring, maintenance scheduling, and real-time availability calculations. Handles complete copy lifecycle from purchase to retirement.
+Physical copy tracking workflow managing individual video copies with condition monitoring and real-time availability calculations. Handles complete copy lifecycle from purchase to retirement.
 
 ## Business Rules
 
 - Individual tracking for each physical copy with unique identifier
-- Copy conditions: New, Good, Fair, Damaged, Defective
-- Available copies must be in Good+ condition for rental
-- Maintenance required for Damaged copies before rental
+- Copy conditions: Good or Defective
+- Available copies must be in Good condition for rental
 - Defective copies removed from rental inventory
 - Real-time availability calculations based on copy status
 
@@ -21,61 +20,51 @@ flowchart TD
     B --> C{Action Type}
     C -->|Add Copy| D[Add New Copy]
     C -->|Update Status| E[Update Copy Status]
-    C -->|Maintenance| F[Schedule Maintenance]
-    C -->|Check Availability| G[Calculate Availability]
+    C -->|Check Availability| F[Calculate Availability]
 
     %% Add New Copy
-    D --> H[Validate Video Exists]
-    H --> I{Video Valid?}
-    I -->|No| J[Return Video Error]
-    I -->|Yes| K[Create Copy Record]
-    K --> L[Set Initial Condition]
-    L --> M[Update Video Availability]
+    D --> G[Validate Video Exists]
+    G --> H{Video Valid?}
+    H -->|No| I[Return Video Error]
+    H -->|Yes| J[Create Copy Record]
+    J --> K[Set Good Condition]
+    K --> L[Update Video Availability]
 
     %% Update Copy Status
-    E --> N[Validate Copy Exists]
-    N --> O{Copy Valid?}
-    O -->|No| P[Return Copy Error]
-    O -->|Yes| Q[Update Copy Condition]
-    Q --> R[Check Rental Impact]
-    R --> S[Update Availability]
-
-    %% Maintenance Processing
-    F --> T[Load Copy Details]
-    T --> U[Schedule Maintenance]
-    U --> V[Update Copy Status to Maintenance]
-    V --> W[Calculate Repair Cost]
-    W --> X[Update Availability]
+    E --> M[Validate Copy Exists]
+    M --> N{Copy Valid?}
+    N -->|No| O[Return Copy Error]
+    N -->|Yes| P[Update Copy Condition]
+    P --> Q[Update Availability]
 
     %% Availability Calculation
-    G --> Y[Query All Copies for Video]
-    Y --> Z[Filter by Condition]
-    Z --> AA[Count Available Copies]
-    AA --> BB[Return Availability Count]
+    F --> R[Query All Copies for Video]
+    R --> S[Filter Good Condition]
+    S --> T[Count Available Copies]
+    T --> U[Return Availability Count]
 
     style A fill:#e1f5fe
-    style M fill:#c8e6c9
-    style S fill:#c8e6c9
-    style X fill:#c8e6c9
-    style BB fill:#c8e6c9
-    style J fill:#ffcdd2
+    style L fill:#c8e6c9
+    style Q fill:#c8e6c9
+    style U fill:#c8e6c9
+    style I fill:#ffcdd2
+    style O fill:#ffcdd2
     style P fill:#ffcdd2
 ```
 
 ## API Endpoints
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/inventory` | Add new copy to inventory |
-| PATCH | `/inventory/{copyId}` | Update copy status/condition |
-| GET | `/inventory/video/{videoId}` | List copies for video |
-| GET | `/videos/{videoId}/availability` | Check real-time availability |
+| Method | Endpoint                         | Purpose                      |
+| ------ | -------------------------------- | ---------------------------- |
+| POST   | `/inventory`                     | Add new copy to inventory    |
+| PATCH  | `/inventory/{copyId}`            | Update copy status/condition |
+| GET    | `/inventory/video/{videoId}`     | List copies for video        |
+| GET    | `/videos/{videoId}/availability` | Check real-time availability |
 
 ## Key Features
 
 - **Individual Copy Tracking**: Unique identifier and condition for each copy
-- **Condition Management**: New, Good, Fair, Damaged, Defective status tracking
-- **Maintenance Workflows**: Repair scheduling and cost tracking
+- **Condition Management**: Good or Defective status tracking
 - **Real-time Availability**: Live calculations based on copy status and condition
 - **Lifecycle Management**: Complete tracking from purchase to retirement
 

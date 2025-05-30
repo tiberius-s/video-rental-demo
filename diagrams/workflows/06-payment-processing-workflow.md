@@ -2,13 +2,13 @@
 
 ## Overview
 
-Comprehensive payment transaction management supporting multiple payment methods, employee discounts, and payment types (rental, late fees, damage, refunds, membership). Maintains complete payment history and audit trails.
+Comprehensive payment transaction management supporting multiple payment methods, customer discounts, and payment types (rental, late fees, damage, refunds, membership). Maintains complete payment history and audit trails.
 
 ## Business Rules
 
 - Payments processed for exact calculated amounts
 - Multiple payment methods: cash, card, check, gift card
-- Employee discounts applied before payment processing
+- Customer discounts applied before payment processing
 - Failed payments require retry or alternative payment
 - Refunds require manager approval over threshold
 - Complete payment history maintained for accounting
@@ -31,7 +31,7 @@ flowchart TD
     F -->|Membership| K[Process Membership]
 
     %% Amount Calculation
-    G --> L{Employee Discount?}
+    G --> L{Customer Discount?}
     H --> M[Validate Fee Amount]
     I --> N[Validate Damage Amount]
     J --> O[Validate Refund Authorization]
@@ -70,17 +70,17 @@ flowchart TD
 
 ## API Endpoints
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/payments` | Process new payment transaction |
-| GET | `/payments/{id}` | Retrieve payment details |
-| GET | `/customers/{id}/payments` | Customer payment history |
-| POST | `/payments/{id}/refund` | Process payment refund |
+| Method | Endpoint                   | Purpose                         |
+| ------ | -------------------------- | ------------------------------- |
+| POST   | `/payments`                | Process new payment transaction |
+| GET    | `/payments/{id}`           | Retrieve payment details        |
+| GET    | `/customers/{id}/payments` | Customer payment history        |
+| POST   | `/payments/{id}/refund`    | Process payment refund          |
 
 ## Key Features
 
 - **Multiple Payment Methods**: Cash, credit/debit cards, checks, gift cards
-- **Employee Discounts**: Automatic discount application before payment
+- **Customer Discounts**: Automatic discount application before payment
 - **Payment Types**: Rental, late fees, damage charges, refunds, membership
 - **Authorization**: Manager approval for refunds over threshold
 - **Audit Trail**: Complete payment history and transaction logging
@@ -89,7 +89,7 @@ flowchart TD
 
 - **Rental Service**: Links payments to rental transactions
 - **Customer Service**: Updates customer payment history and status
-- **Employee Service**: Validates employee discounts and authorization
+- **Customer Service**: Validates customer discounts and authorization
 - **Payment Gateway**: Processes credit card and electronic transactions
 - **Database**: Maintains payment records and transaction integrity
 

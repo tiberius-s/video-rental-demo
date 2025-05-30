@@ -31,17 +31,8 @@ model Inventory {
 
 @doc("Physical condition of a video copy")
 enum CopyCondition {
-  @doc("Copy is in excellent condition")
-  Excellent,
-
   @doc("Copy is in good condition")
   Good,
-
-  @doc("Copy is in fair condition")
-  Fair,
-
-  @doc("Copy is damaged but playable")
-  Damaged,
 
   @doc("Copy is not playable")
   Defective,
@@ -54,9 +45,6 @@ enum CopyStatus {
 
   @doc("Currently rented out")
   Rented,
-
-  @doc("Under maintenance or repair")
-  Maintenance,
 
   @doc("Removed from circulation")
   Retired,

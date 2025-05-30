@@ -49,9 +49,6 @@ enum PaymentType {
   @doc("Payment for damaged item")
   Damage,
 
-  @doc("Refund payment")
-  Refund,
-
   @doc("Membership fee")
   Membership,
 }

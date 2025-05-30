@@ -42,7 +42,7 @@ This project implements a comprehensive **domain-first development workflow** wh
 
 ```bash
 # Root-level build (builds all packages in correct order)
-npm run build:all
+npm run build
 
 # Individual package builds
 npm run build --workspace @video-rental/domain  # TypeSpec + TypeScript
@@ -100,6 +100,7 @@ npm run build --workspace @video-rental/api     # Uses domain spec
 
 - `getOpenApiSpec()` - OpenAPI specification loader with caching
 - `generateSqlSchema()` - SQL schema generation from domain models
+- `generateSqlSchemaFile()` - Generate SQL schema file from domain models
 - TypeScript domain utilities and type definitions
 
 **Features:**
@@ -155,13 +156,13 @@ _Database layer with type-safe operations_
 npm install
 
 # Build all packages in correct order (domain → db → api)
-npm run build:all
+npm run build
 
 # Generate OpenAPI specification from TypeSpec
 npm run tsp:compile
 
-# Run all tests
-npm test
+# Format and lint code
+npm run format && npm run lint
 ```
 
 ## Development Workflow Examples
@@ -194,8 +195,9 @@ npm run build --workspace @video-rental/db
 ### 🗄️ **Database Schema Updates**
 
 ```bash
-# Generate SQL schema from domain models
-npm run codegen:sql --workspace @video-rental/domain
+# Use domain package utilities to generate SQL schema
+import { generateSqlSchemaFile } from "@video-rental/domain"
+generateSqlSchemaFile("./path/to/schema.sql")
 
 # Rebuild DB package to incorporate new schema
 npm run build --workspace @video-rental/db
@@ -205,14 +207,11 @@ npm run build --workspace @video-rental/db
 
 ```bash
 # Start with clean build
-npm run clean:all
-npm run build:all
-
-# Test domain package integration
-npm run test:domain
+npm run clean
+npm run build
 
 # Test cross-package imports work correctly
-npm run test:all
+npm run build --workspace @video-rental/api
 ```
 
 ## Helpful Commands
@@ -223,22 +222,13 @@ npm run test:all
 # Build all packages (root-level build)
 npm run build
 
-# Build all packages (each individual workspace)
-npm run build:all
-
 # Build a specific package
 npm run build --workspace @video-rental/db
 npm run build --workspace @video-rental/api
 npm run build --workspace @video-rental/domain
 
-# Clean all build artifacts (root-level clean)
+# Clean all build artifacts
 npm run clean
-
-# Clean all build artifacts (each individual workspace)
-npm run clean:all
-
-# Clean and rebuild everything
-npm run rebuild
 ```
 
 ### TypeSpec Development
@@ -260,39 +250,7 @@ npm run tsp:validate
 npm run docs:generate
 
 # Development mode for domain package
-npm run dev:domain
-```
-
-### Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests for all packages
-npm run test:all
-
-# Run tests for specific packages
-npm run test:db
-npm run test:api
-npm run test:domain
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with different reporters
-npm run test:reporter        # spec format
-npm run test:reporter:json   # JSON format
-npm run test:reporter:junit  # JUnit XML format
-
-# Run only tests marked with 'only'
-npm run test:only
-
-# Run tests in parallel
-npm run test:parallel
+npm run dev
 ```
 
 ### Code Quality
@@ -310,80 +268,8 @@ npm run lint
 # Fix linting issues
 npm run lint:fix
 
-# Check both formatting and linting
-npm run check
-
 # Fix both formatting and linting
-npm run fix
-
-# Run quality checks for all workspaces
-npm run format:all
-npm run lint:all
-```
-
-### Workspace Management
-
-```bash
-# Install dependencies in all workspaces
-npm run workspace:install
-
-# Update dependencies in all workspaces
-npm run workspace:update
-
-# Check for outdated dependencies
-npm run workspace:outdated
-
-# List all workspace packages
-npm run workspace:list
-
-# Run a command in a specific workspace
-npm run <command> --workspace @video-rental/domain
-npm run <command> --workspace @video-rental/db
-npm run <command> --workspace @video-rental/api
-```
-
-### Development Workflows
-
-```bash
-# Start development mode for domain (TypeSpec watch)
-npm run dev:domain
-
-# Start development mode for database (TypeScript watch)
-npm run dev:db
-
-# Full development setup
-npm run build:all && npm run tsp:watch
-
-# Quality check before commit
-npm run check && npm test
-
-# Full rebuild and test
-npm run rebuild && npm run test:all
-```
-
-### Linting and Formatting
-
-```bash
-# Root-level formatting commands
-npm run format           # Format all files with Prettier
-npm run format:check     # Check formatting without modifying files
-
-# Workspace-level formatting commands
-npm run format:all       # Run format in each workspace
-npm run format:check:all # Run format checking in each workspace
-
-# Root-level linting commands
-npm run lint             # Lint all packages
-npm run lint:fix         # Fix linting issues
-npm run lint:check       # Lint with zero warnings
-
-# Workspace-level linting commands
-npm run lint:all         # Run lint in each workspace
-npm run lint:fix:all     # Fix linting issues in each workspace
-
-# Combined check and fix commands
-npm run check            # Run formatting and linting checks
-npm run fix              # Fix formatting and linting issues
+npm run lint:fix && npm run format
 ```
 
 ## Package Management
@@ -442,14 +328,14 @@ Comprehensive business workflow diagrams with Mermaid flowcharts covering all es
 
 ### Key Features
 
-- **PersonBase composition** - Shared personal information model used by Customer and Employee
-- **Employee role hierarchy** - Manager → Shift Supervisor → Clerk with role-based discount rates (25%/20%/15%)
-- **Comprehensive business rules** - Late fees, employee discounts, inventory tracking, overdue management
+- **Simplified domain model** - Direct customer information without composition patterns
+- **Customer discount support** - Configurable discount percentages per customer
+- **Streamlined business rules** - Late fees, customer discounts, simplified inventory tracking
 - **Type-safe value objects** - Address, Email, PhoneNumber, Money, RentalPeriod with validation
 - **Rich OpenAPI documentation** - Generated from TypeSpec with full business context
 - **Complete workflow coverage** - 8 essential business processes with Mermaid flowcharts
 - **Multi-payment method support** - Cash, credit/debit cards, checks, gift cards
-- **Real-time availability** - Dynamic inventory tracking with condition-based calculations
+- **Real-time availability** - Dynamic inventory tracking with simplified condition management
 
 ## Workflow Architecture Summary
 

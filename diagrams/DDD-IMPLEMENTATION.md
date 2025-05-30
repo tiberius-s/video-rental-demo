@@ -20,8 +20,7 @@ Value objects represent concepts that are defined only by their attributes and h
 
 Core business entities representing the main concepts in the video rental domain:
 
-- **`PersonBase`** - Shared composition pattern with common personal information (name, email, address, phone)
-- **`Customer`** - Customer information with optional discount percentage (uses PersonBase)
+- **`Customer`** - Customer information with personal details (name, email, address, phone) and optional discount percentage
 - **`Video`** - Video catalog entries with metadata, pricing, and availability counts
 - **`Rental`** - Rental transactions with period tracking, fees, and status management
 - **`Inventory`** - Physical video copies with condition and status tracking

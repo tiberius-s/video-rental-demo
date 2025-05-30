@@ -11,14 +11,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./testing": {
-      "types": "./dist/testing/index.d.ts",
-      "default": "./dist/testing/index.js"
-    },
-    "./openapi": {
-      "types": "./dist/openapi.d.ts",
-      "default": "./dist/openapi.js"
     }
   },
   "devDependencies": {
@@ -39,12 +31,11 @@
     "tsp:watch": "tsp compile . --watch",
     "tsp:format": "tsp format lib/**/*.tsp",
     "tsp:validate": "tsp compile . --no-emit",
-    "test": "node --test --import=tsx test/",
-    "lint": "eslint src/ test/ --report-unused-disable-directives --max-warnings=0",
-    "lint:fix": "eslint src/ test/ --report-unused-disable-directives --fix",
+    "lint": "eslint src/ --report-unused-disable-directives --max-warnings=0",
+    "lint:fix": "eslint src/ --report-unused-disable-directives --fix",
     "lint:oas": "npx @redocly/cli@latest lint tsp-output/@typespec/openapi3/openapi.json",
-    "format": "prettier \"src/**/*.ts\" \"test/**/*.ts\" \"lib/**/*.tsp\" --write",
-    "format:check": "prettier \"src/**/*.ts\" \"test/**/*.ts\" \"lib/**/*.tsp\" --check",
+    "format": "prettier \"src/**/*.ts\" \"lib/**/*.tsp\" --write",
+    "format:check": "prettier \"src/**/*.ts\" \"lib/**/*.tsp\" --check",
     "docs:generate": "npm run build:tsp && echo 'OpenAPI spec generated in tsp-output/@typespec/openapi3/openapi.json'",
     "dev": "npm run tsp:watch"
   }

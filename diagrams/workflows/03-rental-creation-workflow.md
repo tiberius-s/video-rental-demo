@@ -2,13 +2,13 @@
 
 ## Overview
 
-Complete rental transaction processing from customer eligibility verification to rental activation. Core business transaction with multi-step validation, employee discount application, and payment processing.
+Complete rental transaction processing from customer eligibility verification to rental activation. Core business transaction with multi-step validation, customer discount application, and payment processing.
 
 ## Business Rules
 
 - Customer must be active with no overdue rentals
 - Video must have available inventory copies
-- Employee customers receive automatic discount calculation
+- Customer discounts receive automatic discount calculation
 - Payment required before rental activation
 - Each rental links to specific inventory copy
 - Rental period determined by video type and customer tier
@@ -36,7 +36,7 @@ flowchart TD
 
     %% Pricing & Payment
     M --> N[Calculate Price]
-    N --> O{Employee Discount?}
+    N --> O{Customer Discount?}
     O -->|Yes| P[Apply Discount]
     O -->|No| Q[Base Price]
     P --> R[Process Payment]
@@ -75,7 +75,7 @@ flowchart TD
 ## Key Features
 
 - **Multi-step Validation**: Customer eligibility, video availability, payment processing
-- **Employee Discounts**: Automatic discount application based on role
+- **Customer Discounts**: Automatic discount application based on customer discount percentage
 - **Inventory Management**: Real-time copy reservation and status updates
 - **Transaction Integrity**: Complete rollback on any failure
 

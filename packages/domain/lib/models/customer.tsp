@@ -1,6 +1,10 @@
-import "./person.tsp";
+import "./value-objects/address.tsp";
+import "./value-objects/email.tsp";
+import "./value-objects/phone-number.tsp";
 
 namespace VideoRental.Domain;
+
+using VideoRental.Domain.ValueObjects;
 
 @doc("Customer entity for API operations")
 model Customer {
@@ -10,7 +14,19 @@ model Customer {
   @doc("The ID of the customer")
   id: string;
 
-  ...PersonBase;
+  @doc("The name of the customer")
+  @minLength(1)
+  @maxLength(255)
+  name: string;
+
+  @doc("The email of the customer")
+  email: Email;
+
+  @doc("The address of the customer")
+  address: Address;
+
+  @doc("The phone number of the customer")
+  phoneNumber: PhoneNumber;
 
   @doc("Customer discount percentage (0-100)")
   discountPercentage?: decimal;

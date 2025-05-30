@@ -106,8 +106,8 @@
 **Business Functions Covered:**
 
 - ✅ Physical copy lifecycle management
-- ✅ Condition tracking (Excellent, Good, Fair, Damaged, Defective)
-- ✅ Status management (Available, Rented, Maintenance, Retired)
+- ✅ Condition tracking (Good, Defective)
+- ✅ Status management (Available, Rented, Retired)
 - ✅ Real-time availability calculations
 
 ---

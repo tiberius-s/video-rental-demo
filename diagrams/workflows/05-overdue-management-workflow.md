@@ -34,22 +34,19 @@ flowchart TD
 
     %% Customer Status
     L --> M{Days Overdue}
-    M -->|1-7| N[Send Reminder]
-    M -->|8-14| O[Send Urgent Notice]
-    M -->|15-30| P[Block New Rentals]
-    M -->|30+| Q[Suspend Account]
+    M -->|1-14| N[Send Reminder]
+    M -->|15-30| O[Block New Rentals]
+    M -->|30+| P[Suspend Account]
 
-    N --> R[Log Notification]
-    O --> S[Log Urgent Notice]
-    P --> T[Update Customer Status]
-    Q --> U[Flag for Collection]
+    N --> Q[Log Notification]
+    O --> R[Update Customer Status]
+    P --> S[Flag for Collection]
 
     style A fill:#e1f5fe
     style E fill:#c8e6c9
-    style R fill:#fff3e0
-    style S fill:#ffeb3b
-    style T fill:#ff9800
-    style U fill:#f44336
+    style Q fill:#fff3e0
+    style R fill:#ff9800
+    style S fill:#f44336
 ```
 
 ## API Endpoints

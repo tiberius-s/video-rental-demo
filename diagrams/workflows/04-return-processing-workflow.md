@@ -8,11 +8,10 @@ This workflow handles video returns including copy inspection, late fee calculat
 
 - Returns must be processed within business hours by staff
 - Late fees are calculated automatically for overdue returns (daily rate-based)
-- Copy condition must be inspected and recorded upon return
-- Damaged copies incur additional damage fees based on severity
+- Copy condition must be inspected and recorded upon return (Good or Defective only)
+- Defective copies are removed from circulation
 - Returns update inventory status and availability immediately
 - Customer accounts are updated with return completion status
-- Refunds may apply if return is early (based on store policy)
 - Staff can override late fees with manager approval
 
 ## Workflow Diagram
@@ -28,26 +27,24 @@ flowchart TD
     F -->|Yes| H[Begin Copy Inspection]
 
     H --> I{Copy Condition}
-    I -->|Good/Excellent| J[No Damage Fees]
-    I -->|Fair/Poor| K[Calculate Damage Fee]
-    I -->|Defective| L[Remove from Service + Replacement Fee]
+    I -->|Good| J[No Additional Fees]
+    I -->|Defective| K[Remove from Service]
 
-    J --> M[Check Return Date]
-    K --> M
-    L --> M
+    J --> L[Check Return Date]
+    K --> L
 
-    M --> N{Return Late?}
-    N -->|No| O[On-Time Return]
-    N -->|Yes| P[Calculate Late Fees]
+    L --> M{Return Late?}
+    M -->|No| N[On-Time Return]
+    M -->|Yes| O[Calculate Late Fees]
 
-    O --> Q[Update Rental Status]
-    P --> R[Apply Late Fees to Account]
-    R --> Q
+    N --> P[Update Rental Status]
+    O --> Q[Apply Late Fees to Account]
+    Q --> P
 
-    Q --> S[Update Inventory Availability]
-    S --> T[Process Payment for Fees]
-    T --> U[Generate Return Receipt]
-    U --> V[Complete Return]
+    P --> R[Update Inventory Status]
+    R --> S[Process Payment for Fees]
+    S --> T[Generate Return Receipt]
+    T --> U[Complete Return]
 
     style A fill:#e1f5fe
     style V fill:#c8e6c9
@@ -57,12 +54,12 @@ flowchart TD
 
 ## API Endpoints
 
-| Endpoint | Method | Purpose | Parameters |
-|----------|--------|---------|------------|
-| `/api/rentals/{id}/return` | POST | Process video return | rental_id, return_condition, staff_id |
-| `/api/rentals/{id}/inspect` | PUT | Update copy condition | rental_id, condition, damage_notes |
-| `/api/rentals/{id}/fees` | GET | Calculate return fees | rental_id |
-| `/api/rentals/{id}/receipt` | GET | Generate return receipt | rental_id |
+| Endpoint                    | Method | Purpose                 | Parameters                            |
+| --------------------------- | ------ | ----------------------- | ------------------------------------- |
+| `/api/rentals/{id}/return`  | POST   | Process video return    | rental_id, return_condition, staff_id |
+| `/api/rentals/{id}/inspect` | PUT    | Update copy condition   | rental_id, condition, damage_notes    |
+| `/api/rentals/{id}/fees`    | GET    | Calculate return fees   | rental_id                             |
+| `/api/rentals/{id}/receipt` | GET    | Generate return receipt | rental_id                             |
 
 ## Key Features
 
