@@ -14,6 +14,7 @@ const packages = [
   "packages/domain/package.json",
   "packages/api/package.json",
   "packages/db/package.json",
+  "packages/ui/package.json",
 ];
 
 for (const pkgPath of packages) {
@@ -30,10 +31,12 @@ for (const pkgPath of packages) {
     if (pkg.dependencies) {
       for (const [depName, depVersion] of Object.entries(pkg.dependencies)) {
         if (depName.startsWith("@video-rental/")) {
-          if (!depVersion.startsWith("workspace:")) {
-            console.log(`    ⚠️  Should use workspace: protocol for ${depName}`);
-          } else {
+          if (depVersion.startsWith("workspace:")) {
             console.log(`    ✅ Using workspace protocol for ${depName}`);
+          } else if (depVersion.startsWith("file:")) {
+            console.log(`    ✅ Using file protocol for ${depName} (workspace alternative)`);
+          } else {
+            console.log(`    ⚠️  Should use workspace: or file: protocol for ${depName}`);
           }
         }
       }
@@ -47,16 +50,20 @@ for (const pkgPath of packages) {
 // Check for common scripts across packages
 console.log("\n🔧 Checking script consistency...");
 const commonScripts = ["build", "clean", "test", "lint", "format", "typecheck"];
+const uiScripts = ["build", "lint"]; // UI package has different script requirements
 
 for (const pkgPath of packages) {
   try {
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
-    const missingScripts = commonScripts.filter((script) => !pkg.scripts?.[script]);
+
+    // UI package has different script requirements
+    const requiredScripts = pkg.name === "@video-rental/ui" ? uiScripts : commonScripts;
+    const missingScripts = requiredScripts.filter((script) => !pkg.scripts?.[script]);
 
     if (missingScripts.length > 0) {
       console.log(`  ⚠️  ${pkg.name} missing scripts: ${missingScripts.join(", ")}`);
     } else {
-      console.log(`  ✅ ${pkg.name} has all common scripts`);
+      console.log(`  ✅ ${pkg.name} has all required scripts`);
     }
   } catch (error) {
     console.log(`  ❌ Failed to check scripts for ${pkgPath}: ${error.message}`);

@@ -21,7 +21,7 @@
     "test:no-coverage": "node --test --import=tsx src/**/*.test.ts"
   },
   "dependencies": {
-    "@video-rental/domain": "workspace:*",
+    "@video-rental/domain": "file:../domain",
     "express": "^5.1.0",
     "pino": "^9.6.0"
   },
