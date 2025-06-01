@@ -329,8 +329,14 @@ Our video rental domain encompasses:
 
 ```typescript
 // Domain models drive the database schema.
-import { generateSqlSchema } from "@video-rental/domain/codegen";
-const schema = generateSqlSchema(); // Enables type-safe database operations.
+import { generateSqlSchema, loadComponentsSchemasFromFile } from "@video-rental/db";
+import { openApiSpec } from "@video-rental/domain";
+
+// Load schema components from domain spec
+const componentsSchemas = openApiSpec.getSchemas();
+
+// Generate SQL schema using the db package
+const schema = generateSqlSchema(componentsSchemas); // Enables type-safe database operations.
 ```
 
 ### API Layer Integration

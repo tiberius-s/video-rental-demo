@@ -16,9 +16,9 @@
     "lint:fix": "eslint src/ test/ --report-unused-disable-directives --fix",
     "format": "prettier \"src/**/*.ts\" \"test/**/*.ts\" --write",
     "format:check": "prettier \"src/**/*.ts\" \"test/**/*.ts\" --check",
-    "test": "echo 'No tests defined for API package - placeholder for future unit and integration tests'",
-    "test:watch": "echo 'Test watch mode not yet configured'",
-    "test:coverage": "echo 'Test coverage not yet configured'"
+    "test": "node --test --experimental-test-coverage --test-coverage-exclude='**/*.test.ts' --import=tsx src/**/*.test.ts",
+    "test:watch": "node --test --watch --import=tsx src/**/*.test.ts",
+    "test:no-coverage": "node --test --import=tsx src/**/*.test.ts"
   },
   "dependencies": {
     "@video-rental/domain": "workspace:*",

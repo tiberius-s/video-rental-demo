@@ -16,7 +16,7 @@
     "lint:fix": "eslint packages --fix && npm run lint:fix --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:watch": "npm run test:watch --workspaces --if-present",
-    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "test:no-coverage": "npm run test:no-coverage --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "tsp:compile": "npm run tsp:compile --workspace @video-rental/domain",
     "tsp:watch": "npm run tsp:watch --workspace @video-rental/domain",

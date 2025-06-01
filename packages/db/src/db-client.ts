@@ -12,8 +12,9 @@ export interface DatabaseInfo {
 
 const MEMORY_DB_NAME = ":memory:";
 const MEMORY_MAP_SIZE = 268435456; // 256MB
-const CACHE_SIZE = -64000; // 64MB
-const BUSY_TIMEOUT = 5000;
+const CACHE_SIZE = -64000; // 64MB (negative = KB)
+const BUSY_TIMEOUT = 5000; // 5 seconds
+const PAGE_SIZE = 4096; // Optimal for most systems
 
 /**
  * A high-level client for SQLite database operations with optimized performance settings.
@@ -130,6 +131,54 @@ export class DbClient {
     return result as T;
   }
 
+  // Performance and Maintenance Utilities
+
+  /**
+   * Run VACUUM to reclaim space and optimize database file
+   * Should be run periodically for databases with frequent deletes
+   */
+  vacuum(): void {
+    this.#db.exec("VACUUM");
+  }
+
+  /**
+   * Run incremental vacuum to reclaim some space without full VACUUM
+   * Less disruptive than full VACUUM for active databases
+   */
+  incrementalVacuum(pages?: number): void {
+    const pagesClause = pages ? `(${pages})` : "";
+    this.#db.exec(`PRAGMA incremental_vacuum${pagesClause}`);
+  }
+
+  /**
+   * Analyze database statistics for query optimization
+   * Should be run after significant data changes
+   */
+  analyze(): void {
+    this.#db.exec("ANALYZE");
+  }
+
+  /**
+   * Get database size information
+   */
+  getDatabaseSize(): { pageCount: number; pageSize: number; totalSizeBytes: number } {
+    const pageCount = this.pragma<number>("page_count");
+    const pageSize = this.pragma<number>("page_size");
+    return {
+      pageCount,
+      pageSize,
+      totalSizeBytes: pageCount * pageSize,
+    };
+  }
+
+  /**
+   * Check database integrity
+   */
+  integrityCheck(): string[] {
+    const result = this.#db.pragma("integrity_check");
+    return Array.isArray(result) ? result.map((r) => String(r)) : [String(result)];
+  }
+
   // Private Methods
 
   #setupPragmas(dbName: string): void {
@@ -152,9 +201,13 @@ export class DbClient {
       this.#db.pragma("journal_mode = WAL");
     }
 
+    // Performance optimizations based on SQLite best practices
+    this.#db.pragma("synchronous = NORMAL"); // Balance safety vs performance
     this.#db.pragma("temp_store = MEMORY");
     this.#db.pragma(`mmap_size = ${MEMORY_MAP_SIZE}`);
     this.#db.pragma(`cache_size = ${CACHE_SIZE}`);
+    this.#db.pragma(`page_size = ${PAGE_SIZE}`); // Set optimal page size
+    this.#db.pragma("auto_vacuum = INCREMENTAL"); // Prevent bloat
   }
 
   #isFileDatabase(dbName: string): boolean {

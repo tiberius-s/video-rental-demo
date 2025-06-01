@@ -37,7 +37,9 @@
     "lint:oas": "npx @redocly/cli@latest lint tsp-output/@typespec/openapi3/openapi.json",
     "format": "prettier \"src/**/*.ts\" \"lib/**/*.tsp\" --write",
     "format:check": "prettier \"src/**/*.ts\" \"lib/**/*.tsp\" --check",
-    "test": "echo 'No tests defined for domain package - placeholder for future custom linters/decorators'",
+    "test": "node --test --experimental-test-coverage --test-coverage-exclude='**/*.test.ts' --import=tsx src/**/*.test.ts",
+    "test:watch": "node --test --watch --import=tsx src/**/*.test.ts",
+    "test:no-coverage": "node --test --import=tsx src/**/*.test.ts",
     "docs:generate": "npm run build:tsp && echo 'OpenAPI spec generated in tsp-output/@typespec/openapi3/openapi.json'",
     "dev": "npm run tsp:watch"
   }

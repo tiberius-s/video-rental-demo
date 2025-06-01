@@ -12,3 +12,4 @@
 - when you create test or backup files, I want those deleted at the end
 - project was put together with node 22, so use the best modern methods when called for
 - use the native test framework, 'node:test' for unit tests, and combine 'node:test' with fetch when functional tests are needed for the API
+- use tsx to run typescript files directly only

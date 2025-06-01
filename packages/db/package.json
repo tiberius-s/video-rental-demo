@@ -20,9 +20,9 @@
     "lint:fix": "eslint src/ --report-unused-disable-directives --fix",
     "format": "prettier \"src/**/*.ts\" --write",
     "format:check": "prettier \"src/**/*.ts\" --check",
-    "test": "node --test --import=tsx src/**/*.test.ts",
+    "test": "node --test --experimental-test-coverage --test-coverage-exclude='**/*.test.ts' --import=tsx src/**/*.test.ts",
     "test:watch": "node --test --watch --import=tsx src/**/*.test.ts",
-    "test:coverage": "node --test --experimental-test-coverage --import=tsx src/**/*.test.ts",
+    "test:no-coverage": "node --test --import=tsx src/**/*.test.ts",
     "dev": "npm run build -- --watch",
     "typecheck": "tsc --noEmit"
   },

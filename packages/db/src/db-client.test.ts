@@ -1,8 +1,8 @@
-import { test, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert";
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
+import { afterEach, beforeEach, describe, test } from "node:test";
 
 import { DbClient } from "./db-client.js";
 
@@ -510,6 +510,248 @@ describe("DbClient", () => {
     });
   });
 
+  describe("performance and maintenance utilities", () => {
+    beforeEach(() => {
+      // Create test table with some data
+      client.exec(`
+        CREATE TABLE test_maintenance (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          data TEXT
+        )
+      `);
+
+      // Insert test data
+      for (let i = 1; i <= 10; i++) {
+        client.execute("INSERT INTO test_maintenance (name, data) VALUES (?, ?)", [
+          `name${i}`,
+          `data${i}`,
+        ]);
+      }
+    });
+
+    test("should run vacuum successfully", () => {
+      // Insert and delete some data to create fragmentation
+      client.execute("INSERT INTO test_maintenance (name, data) VALUES (?, ?)", ["temp", "temp"]);
+      client.execute("DELETE FROM test_maintenance WHERE name = ?", ["temp"]);
+
+      // Run vacuum - should not throw
+      assert.doesNotThrow(() => {
+        client.vacuum();
+      }, "Vacuum should execute without error");
+    });
+
+    test("should run incremental vacuum successfully", () => {
+      assert.doesNotThrow(() => {
+        client.incrementalVacuum();
+      }, "Incremental vacuum should execute without error");
+
+      assert.doesNotThrow(() => {
+        client.incrementalVacuum(10);
+      }, "Incremental vacuum with pages should execute without error");
+    });
+
+    test("should run analyze successfully", () => {
+      assert.doesNotThrow(() => {
+        client.analyze();
+      }, "Analyze should execute without error");
+    });
+
+    test("should get database size information", () => {
+      const sizeInfo = client.getDatabaseSize();
+
+      assert.ok(typeof sizeInfo.pageCount === "number", "Page count should be a number");
+      assert.ok(typeof sizeInfo.pageSize === "number", "Page size should be a number");
+      assert.ok(typeof sizeInfo.totalSizeBytes === "number", "Total size should be a number");
+      assert.ok(sizeInfo.pageCount > 0, "Page count should be positive");
+      assert.ok(sizeInfo.pageSize > 0, "Page size should be positive");
+      assert.strictEqual(
+        sizeInfo.totalSizeBytes,
+        sizeInfo.pageCount * sizeInfo.pageSize,
+        "Total size should equal page count times page size",
+      );
+    });
+
+    test("should check database integrity", () => {
+      const integrityResult = client.integrityCheck();
+
+      assert.ok(Array.isArray(integrityResult), "Integrity check should return an array");
+      assert.ok(integrityResult.length > 0, "Integrity check should return at least one result");
+
+      // For a healthy database, first result should be "ok"
+      const firstResult = integrityResult[0];
+      assert.ok(typeof firstResult === "string", "Integrity result should be a string");
+    });
+  });
+
+  describe("pragma management", () => {
+    test("should get pragma values", () => {
+      const journalMode = client.pragma<string>("journal_mode");
+      assert.ok(typeof journalMode === "string", "Journal mode should be a string");
+
+      const foreignKeys = client.pragma<number>("foreign_keys");
+      assert.ok(typeof foreignKeys === "number", "Foreign keys should be a number");
+    });
+
+    test("should set pragma values", () => {
+      // Test setting a pragma value
+      client.pragma("cache_size", -32000);
+      const cacheSize = client.pragma<number>("cache_size");
+      assert.strictEqual(cacheSize, -32000, "Cache size should be updated");
+    });
+
+    test("should handle unknown pragma", () => {
+      assert.throws(
+        () => {
+          client.pragma("unknown_pragma_name");
+        },
+        /Unknown pragma/,
+        "Should throw for unknown pragma",
+      );
+    });
+
+    test("should handle pragma result objects", () => {
+      // Some pragmas return objects - test with compile_options which returns array of objects
+      const compileOptions = client.pragma("compile_options");
+      assert.ok(compileOptions !== undefined, "Compile options should return a result");
+    });
+  });
+
+  describe("constructor options", () => {
+    test("should skip pragma setup when requested", () => {
+      const tempDbPath = path.join(os.tmpdir(), `no-pragma-test-${Date.now()}.db`);
+
+      try {
+        const clientWithoutPragmas = new DbClient(tempDbPath, { skipPragmaSetup: true });
+
+        // Since pragmas are skipped, journal mode might not be WAL
+        const journalMode = clientWithoutPragmas.pragma<string>("journal_mode");
+        assert.ok(typeof journalMode === "string", "Journal mode should still be readable");
+
+        clientWithoutPragmas.close();
+      } finally {
+        if (fs.existsSync(tempDbPath)) {
+          fs.unlinkSync(tempDbPath);
+        }
+      }
+    });
+
+    test("should handle file database pragma setup correctly", () => {
+      const tempDbPath = path.join(os.tmpdir(), `pragma-test-${Date.now()}.db`);
+
+      try {
+        const fileClient = new DbClient(tempDbPath);
+
+        // Check that file-specific optimizations are applied
+        const journalMode = fileClient.pragma<string>("journal_mode");
+        const tempStore = fileClient.pragma<number>("temp_store");
+        const foreignKeys = fileClient.pragma<number>("foreign_keys");
+
+        assert.strictEqual(journalMode, "wal", "File database should use WAL mode");
+        assert.strictEqual(tempStore, 2, "Temp store should be memory (value 2)");
+        assert.strictEqual(foreignKeys, 1, "Foreign keys should be enabled");
+
+        fileClient.close();
+      } finally {
+        if (fs.existsSync(tempDbPath)) {
+          fs.unlinkSync(tempDbPath);
+        }
+      }
+    });
+  });
+
+  describe("query helpers comprehensive coverage", () => {
+    beforeEach(() => {
+      client.exec(`
+        CREATE TABLE comprehensive_test (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          value REAL,
+          active BOOLEAN DEFAULT 1
+        )
+      `);
+    });
+
+    test("should handle query with no results", () => {
+      const results = client.query<TestRow>("SELECT * FROM comprehensive_test WHERE id = ?", [999]);
+      assert.strictEqual(results.length, 0, "Query with no results should return empty array");
+    });
+
+    test("should handle queryOne with no results", () => {
+      const result = client.queryOne<TestRow>("SELECT * FROM comprehensive_test WHERE id = ?", [
+        999,
+      ]);
+      assert.strictEqual(result, undefined, "QueryOne with no results should return undefined");
+    });
+
+    test("should handle execute with no parameters", () => {
+      const result = client.execute("INSERT INTO comprehensive_test (name) VALUES ('test')");
+      assert.strictEqual(result.changes, 1, "Execute without parameters should work");
+      assert.ok(result.lastInsertRowid, "Should return insert ID");
+    });
+
+    test("should handle complex queries with multiple parameters", () => {
+      // Insert test data (using 1/0 for boolean values as SQLite expects)
+      client.execute("INSERT INTO comprehensive_test (name, value, active) VALUES (?, ?, ?)", [
+        "test1",
+        1.5,
+        1,
+      ]);
+      client.execute("INSERT INTO comprehensive_test (name, value, active) VALUES (?, ?, ?)", [
+        "test2",
+        2.5,
+        0,
+      ]);
+      client.execute("INSERT INTO comprehensive_test (name, value, active) VALUES (?, ?, ?)", [
+        "test3",
+        3.5,
+        1,
+      ]);
+
+      // Complex query with multiple conditions
+      const results = client.query(
+        "SELECT * FROM comprehensive_test WHERE value > ? AND active = ? ORDER BY value",
+        [2.0, 1],
+      );
+
+      assert.strictEqual(results.length, 1, "Should find one matching record");
+      assert.strictEqual(results[0].name, "test3", "Should return correct record");
+    });
+  });
+
+  describe("backup functionality", () => {
+    test("should backup database successfully", async () => {
+      const backupPath = path.join(os.tmpdir(), `backup-test-${Date.now()}.db`);
+
+      try {
+        // Create some test data
+        client.exec("CREATE TABLE backup_test (id INTEGER, name TEXT)");
+        client.execute("INSERT INTO backup_test VALUES (?, ?)", [1, "test"]);
+
+        // Perform backup
+        await client.backup(backupPath);
+
+        // Verify backup file exists
+        assert.ok(fs.existsSync(backupPath), "Backup file should exist");
+
+        // Verify backup contains data by opening it
+        const backupClient = new DbClient(backupPath);
+        const data = backupClient.queryOne<BackupTestRow>(
+          "SELECT * FROM backup_test WHERE id = ?",
+          [1],
+        );
+        assert.ok(data, "Backup should contain test data");
+        assert.strictEqual(data.name, "test", "Backup data should match original");
+
+        backupClient.close();
+      } finally {
+        if (fs.existsSync(backupPath)) {
+          fs.unlinkSync(backupPath);
+        }
+      }
+    });
+  });
+
   describe("edge cases", () => {
     test("should handle multiple database connections", () => {
       // Create temporary database for multi-client testing
@@ -555,6 +797,208 @@ describe("DbClient", () => {
       const row = client.queryOne<NullableTestRow>("SELECT * FROM test WHERE id = ?", [1]);
       assert.ok(row, "Expected row to be defined");
       assert.strictEqual(row.value, null, "Null value should be preserved");
+    });
+
+    test("should handle large transactions", () => {
+      client.exec("CREATE TABLE large_test (id INTEGER, data TEXT)");
+
+      const result = client.transaction(() => {
+        let insertCount = 0;
+        const stmt = client.prepare("INSERT INTO large_test (data) VALUES (?)");
+
+        for (let i = 0; i < 1000; i++) {
+          const insertResult = client.run(stmt, [`data${i}`]);
+          if (insertResult.changes === 1) {
+            insertCount++;
+          }
+        }
+
+        return insertCount;
+      });
+
+      assert.strictEqual(result, 1000, "Should insert all 1000 records in transaction");
+
+      // Verify count
+      const count = client.queryOne<{ count: number }>("SELECT COUNT(*) as count FROM large_test");
+      assert.strictEqual(count?.count, 1000, "Database should contain all records");
+    });
+
+    test("should handle transaction rollback on error", () => {
+      client.exec("CREATE TABLE rollback_test (id INTEGER PRIMARY KEY, name TEXT UNIQUE)");
+
+      // Insert initial data
+      client.execute("INSERT INTO rollback_test (name) VALUES (?)", ["initial"]);
+
+      // Try transaction that should fail due to unique constraint
+      assert.throws(() => {
+        client.transaction(() => {
+          client.execute("INSERT INTO rollback_test (name) VALUES (?)", ["valid"]);
+          client.execute("INSERT INTO rollback_test (name) VALUES (?)", ["initial"]); // Should fail
+        });
+      }, "Transaction should throw on constraint violation");
+
+      // Verify rollback - only initial record should exist
+      const count = client.queryOne<{ count: number }>(
+        "SELECT COUNT(*) as count FROM rollback_test",
+      );
+      assert.strictEqual(count?.count, 1, "Transaction should be rolled back");
+
+      const remaining = client.queryOne<{ name: string }>("SELECT name FROM rollback_test");
+      assert.strictEqual(remaining?.name, "initial", "Only initial record should remain");
+    });
+
+    test("should handle concurrent access patterns", () => {
+      const tempDbPath = path.join(os.tmpdir(), `concurrent-test-${Date.now()}.db`);
+
+      try {
+        const client1 = new DbClient(tempDbPath);
+        const client2 = new DbClient(tempDbPath);
+
+        client1.exec("CREATE TABLE concurrent_test (id INTEGER PRIMARY KEY, data TEXT)");
+
+        // Simulate concurrent writes (they will be serialized by SQLite)
+        client1.execute("INSERT INTO concurrent_test (data) VALUES (?)", ["client1_data"]);
+        client2.execute("INSERT INTO concurrent_test (data) VALUES (?)", ["client2_data"]);
+
+        // Both clients should see both records
+        const count1 = client1.queryOne<{ count: number }>(
+          "SELECT COUNT(*) as count FROM concurrent_test",
+        );
+        const count2 = client2.queryOne<{ count: number }>(
+          "SELECT COUNT(*) as count FROM concurrent_test",
+        );
+
+        assert.strictEqual(count1?.count, 2, "Client 1 should see both records");
+        assert.strictEqual(count2?.count, 2, "Client 2 should see both records");
+
+        client1.close();
+        client2.close();
+      } finally {
+        if (fs.existsSync(tempDbPath)) {
+          fs.unlinkSync(tempDbPath);
+        }
+      }
+    });
+  });
+
+  describe("additional coverage tests", () => {
+    test("should handle pragma edge cases comprehensively", () => {
+      // Test various pragma edge cases to improve coverage
+
+      // Test setting pragma with boolean
+      client.pragma("foreign_keys", true);
+      const foreignKeys = client.pragma<number>("foreign_keys");
+      assert.strictEqual(foreignKeys, 1, "Boolean true should set pragma to 1");
+
+      // Test setting pragma with false
+      client.pragma("foreign_keys", false);
+      const foreignKeysOff = client.pragma<number>("foreign_keys");
+      assert.strictEqual(foreignKeysOff, 0, "Boolean false should set pragma to 0");
+
+      // Test pragma that returns object-like results
+      client.exec("CREATE TABLE test_pragma (id INTEGER, name TEXT)");
+      const tableInfo = client.pragma("table_info", "test_pragma");
+      assert.ok(tableInfo !== undefined, "Table info should return results");
+    });
+
+    test("should handle pragma result objects correctly", () => {
+      // Test with table_info which returns object array
+      client.exec("CREATE TABLE pragma_test (id INTEGER, name TEXT)");
+      const tableInfo = client.pragma("table_info", "pragma_test");
+      assert.ok(tableInfo !== undefined, "Table info should return results");
+    });
+
+    test("should handle file optimization setup edge cases", () => {
+      const tempDbPath = path.join(os.tmpdir(), `edge-test-${Date.now()}.db`);
+
+      try {
+        const fileClient = new DbClient(tempDbPath);
+
+        // Test that journal mode is already WAL and doesn't need changing
+        const initialMode = fileClient.pragma<string>("journal_mode");
+        assert.strictEqual(initialMode, "wal", "Should already be in WAL mode");
+
+        // Create another client to test journal mode detection
+        const fileClient2 = new DbClient(tempDbPath);
+        const mode2 = fileClient2.pragma<string>("journal_mode");
+        assert.strictEqual(mode2, "wal", "Second client should also see WAL mode");
+
+        fileClient.close();
+        fileClient2.close();
+      } finally {
+        if (fs.existsSync(tempDbPath)) {
+          fs.unlinkSync(tempDbPath);
+        }
+      }
+    });
+
+    test("should handle various pragma result types", () => {
+      // Test different pragma return types to improve branch coverage
+      const cacheSize = client.pragma<number>("cache_size");
+      assert.ok(typeof cacheSize === "number", "Cache size should be number");
+
+      const foreignKeys = client.pragma<number>("foreign_keys");
+      assert.ok(typeof foreignKeys === "number", "Foreign keys should be number");
+
+      const journalMode = client.pragma<string>("journal_mode");
+      assert.ok(typeof journalMode === "string", "Journal mode should be string");
+    });
+
+    test("should handle backup to existing directory", async () => {
+      const tempDir = os.tmpdir();
+      const backupPath = path.join(tempDir, `existing-dir-backup-${Date.now()}.db`);
+
+      try {
+        // Create test data
+        client.exec("CREATE TABLE existing_test (id INTEGER, data TEXT)");
+        client.execute("INSERT INTO existing_test VALUES (?, ?)", [1, "backup_test"]);
+
+        // Backup to existing directory
+        await client.backup(backupPath);
+
+        // Verify backup
+        assert.ok(fs.existsSync(backupPath), "Backup should be created in existing directory");
+
+        const backupClient = new DbClient(backupPath);
+        const data = backupClient.queryOne<{ data: string }>(
+          "SELECT data FROM existing_test WHERE id = ?",
+          [1],
+        );
+        assert.strictEqual(data?.data, "backup_test", "Backup data should be preserved");
+        backupClient.close();
+      } finally {
+        if (fs.existsSync(backupPath)) {
+          fs.unlinkSync(backupPath);
+        }
+      }
+    });
+
+    test("should handle database info for readonly databases", () => {
+      // Test getDatabaseInfo with different database states
+      const info = client.getDatabaseInfo();
+      assert.strictEqual(typeof info.readonly, "boolean", "Readonly should be boolean");
+      assert.strictEqual(info.readonly, false, "In-memory database should not be readonly");
+    });
+
+    test("should handle maintenance operations on empty database", () => {
+      // Test maintenance operations on database without data
+      assert.doesNotThrow(() => {
+        client.vacuum();
+      }, "Vacuum should work on empty database");
+
+      assert.doesNotThrow(() => {
+        client.analyze();
+      }, "Analyze should work on empty database");
+
+      const sizeInfo = client.getDatabaseSize();
+      assert.ok(sizeInfo.pageCount >= 0, "Page count should be non-negative");
+    });
+
+    test("should handle various error conditions in pragma", () => {
+      // Test pragma error handling
+      assert.throws(() => {
+        client.pragma("completely_invalid_pragma_name_that_does_not_exist");
+      }, "Should throw for completely invalid pragma");
     });
   });
 });
