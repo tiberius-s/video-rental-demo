@@ -1,8 +1,17 @@
 {
   "name": "@video-rental/root",
   "version": "0.0.1",
+  "author": "Tiberius Silivestru <tiberius.silivestru@gmail.com>",
+  "license": "MIT",
+  "description": "A video rental demo project",
   "main": "dist/index.js",
   "type": "module",
+  "keywords": [
+    "typescript",
+    "typespec",
+    "monorepo"
+  ],
+  "private": true,
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "build:packages": "npm run build --workspace @video-rental/domain && npm run build --workspace @video-rental/db && npm run build --workspace @video-rental/api",
@@ -26,11 +35,6 @@
     "version:sync": "npm version --workspaces",
     "workspace:validate": "node scripts/validate-workspace.js"
   },
-  "keywords": [],
-  "author": "Tiberius Silivestru <tiberius.silivestru@gmail.com>",
-  "license": "MIT",
-  "description": "",
-  "private": true,
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@swc-node/register": "^1.10.10",
