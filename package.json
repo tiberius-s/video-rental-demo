@@ -32,17 +32,17 @@
   "description": "",
   "private": true,
   "devDependencies": {
-    "@eslint/js": "^9.27.0",
+    "@eslint/js": "^9.33.0",
     "@swc-node/register": "^1.10.10",
     "@tsconfig/node22": "^22.0.2",
-    "@types/node": "^22.15.21",
-    "eslint": "^9.27.0",
-    "eslint-config-prettier": "^10.1.5",
-    "neostandard": "^0.12.1",
-    "prettier": "^3.5.3",
-    "tsx": "^4.19.2",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.1"
+    "@types/node": "^24.3.0",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "neostandard": "^0.12.2",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.1"
   },
   "workspaces": [
     "packages/*"

@@ -14,13 +14,15 @@
     }
   },
   "devDependencies": {
-    "@typespec/compiler": "^1.0.0",
-    "@typespec/http": "^1.0.1",
-    "@typespec/library-linter": "^0.70.0",
-    "@typespec/openapi": "^1.0.0",
-    "@typespec/openapi3": "^1.0.0",
-    "@typespec/prettier-plugin-typespec": "^1.0.0",
-    "@typespec/rest": "^0.70.0"
+    "@apidevtools/swagger-parser": "^12.0.0",
+    "@typespec/compiler": "^1.3.0",
+    "@typespec/http": "^1.3.0",
+    "@typespec/library-linter": "^0.73.0",
+    "@typespec/openapi": "^1.3.0",
+    "@typespec/openapi3": "^1.3.0",
+    "@typespec/prettier-plugin-typespec": "^1.3.0",
+    "@typespec/rest": "^0.73.0",
+    "fast-uri": "^3.0.6"
   },
   "scripts": {
     "build": "npm run build:tsp && npm run build:ts",
@@ -42,9 +44,5 @@
     "test:no-coverage": "node --test --import=tsx src/**/*.test.ts",
     "docs:generate": "npm run build:tsp && echo 'OpenAPI spec generated in tsp-output/@typespec/openapi3/openapi.json'",
     "dev": "npm run tsp:watch"
-  },
-  "dependencies": {
-    "@apidevtools/swagger-parser": "^10.1.1",
-    "fast-uri": "^3.0.6"
   }
 }
