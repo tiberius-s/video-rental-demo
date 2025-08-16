@@ -38,6 +38,7 @@
     "@types/node": "^24.3.0",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-node": "latest",
     "neostandard": "^0.12.2",
     "prettier": "^3.6.2",
     "tsx": "^4.20.4",
