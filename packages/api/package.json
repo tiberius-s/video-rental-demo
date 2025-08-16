@@ -11,6 +11,9 @@
     "clean": "rm -rf dist *.tsbuildinfo",
     "dev": "npm run build -- --watch",
     "start": "node dist/index.js",
+    "generate:types": "tsx scripts/generate-types.ts",
+    "generate:schema": "tsx scripts/generate-schema.ts",
+    "init:database": "tsx scripts/init-database.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/ --report-unused-disable-directives --max-warnings=0",
     "lint:fix": "eslint src/ test/ --report-unused-disable-directives --fix",
@@ -21,11 +24,13 @@
     "test:no-coverage": "node --test --import=tsx src/**/*.test.ts"
   },
   "dependencies": {
+    "@video-rental/db": "file:../db",
     "@video-rental/domain": "file:../domain",
     "express": "^5.1.0",
     "pino": "^9.6.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.2"
+    "@types/express": "^5.0.2",
+    "openapi-typescript": "^7.8.0"
   }
 }

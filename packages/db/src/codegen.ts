@@ -194,72 +194,207 @@ function extractTableFromRef(ref: string): string | null {
 function generateIndexes(tableName: string, schema: any, includeTimestamps: boolean): string {
   const indexes: string[] = [];
 
+  // Skip creating indexes for certain schemas that don't need them
+  if (shouldSkipIndexes(tableName)) {
+    return "";
+  }
+
   if (schema.properties) {
     for (const [propName, propSchema] of Object.entries(schema.properties)) {
       const columnName = toSnakeCase(propName);
       const prop = propSchema as any;
 
-      // Index foreign keys (highest priority for performance)
+      // Index foreign keys (highest priority for query performance)
       if (prop.$ref || (prop.type === "integer" && propName.endsWith("Id"))) {
-        indexes.push(`CREATE INDEX idx_${tableName}_${columnName} ON ${tableName}(${columnName});`);
-      }
-
-      // Index searchable text fields (for LIKE queries with prefix matching)
-      if (prop.type === "string" && isSearchableField(propName)) {
-        indexes.push(`CREATE INDEX idx_${tableName}_${columnName} ON ${tableName}(${columnName});`);
-      }
-
-      // Index unique fields with unique constraint
-      if (prop.format === "email" || propName.toLowerCase().includes("email")) {
         indexes.push(
-          `CREATE UNIQUE INDEX idx_${tableName}_${columnName}_unique ON ${tableName}(${columnName});`,
+          `CREATE INDEX IF NOT EXISTS idx_${tableName}_${columnName} ON ${tableName}(${columnName});`,
         );
       }
 
-      // Index boolean fields for filtering (common in business logic)
-      if (prop.type === "boolean") {
-        indexes.push(`CREATE INDEX idx_${tableName}_${columnName} ON ${tableName}(${columnName});`);
+      // Index business status/state fields for filtering (critical for business queries)
+      if (isBusinessStatusField(propName, prop)) {
+        indexes.push(
+          `CREATE INDEX IF NOT EXISTS idx_${tableName}_${columnName} ON ${tableName}(${columnName});`,
+        );
       }
 
-      // Index enum fields for category filtering
-      if (prop.enum) {
-        indexes.push(`CREATE INDEX idx_${tableName}_${columnName} ON ${tableName}(${columnName});`);
+      // Index unique email fields with unique constraint
+      if (prop.format === "email" || propName.toLowerCase() === "email") {
+        indexes.push(
+          `CREATE UNIQUE INDEX IF NOT EXISTS idx_${tableName}_${columnName}_unique ON ${tableName}(${columnName});`,
+        );
       }
 
-      // Index numeric fields that might be used for ranges or sorting
-      if ((prop.type === "number" || prop.type === "integer") && isRangeField(propName)) {
-        indexes.push(`CREATE INDEX idx_${tableName}_${columnName} ON ${tableName}(${columnName});`);
+      // Index specific searchable fields based on actual API patterns
+      if (isApiSearchableField(tableName, propName, prop)) {
+        indexes.push(
+          `CREATE INDEX IF NOT EXISTS idx_${tableName}_${columnName} ON ${tableName}(${columnName});`,
+        );
+      }
+
+      // Index specific business fields for filtering based on API usage patterns
+      if (isApiFilterField(tableName, propName, prop)) {
+        indexes.push(
+          `CREATE INDEX IF NOT EXISTS idx_${tableName}_${columnName} ON ${tableName}(${columnName});`,
+        );
+      }
+
+      // Index date fields that are used for business logic (due dates, rental dates)
+      if (isBusinessDateField(tableName, propName, prop)) {
+        indexes.push(
+          `CREATE INDEX IF NOT EXISTS idx_${tableName}_${columnName} ON ${tableName}(${columnName});`,
+        );
       }
     }
   }
 
-  // Index timestamps for sorting and filtering (very common in applications)
-  if (includeTimestamps) {
-    indexes.push(`CREATE INDEX idx_${tableName}_created_at ON ${tableName}(created_at);`);
-    indexes.push(`CREATE INDEX idx_${tableName}_updated_at ON ${tableName}(updated_at);`);
+  // Only add timestamp indexes for core business tables, not for every schema
+  if (includeTimestamps && isCoreBusinessTable(tableName)) {
+    // Skip timestamp indexes - they're rarely used in this business domain
   }
 
   return indexes.join("\n");
 }
 
-function isSearchableField(fieldName: string): boolean {
-  const searchablePatterns = ["name", "title", "description", "email", "phone"];
-  return searchablePatterns.some((pattern) => fieldName.toLowerCase().includes(pattern));
+/**
+ * Check if table should skip index generation entirely
+ */
+function shouldSkipIndexes(tableName: string): boolean {
+  // Skip indexes for value objects, update schemas, and other non-core tables
+  const skipPatterns = [
+    "value_objects.",
+    "_create",
+    "_update",
+    "health_response",
+    "api_documentation",
+  ];
+  return skipPatterns.some((pattern) => tableName.includes(pattern));
 }
 
-function isRangeField(fieldName: string): boolean {
-  const rangePatterns = [
-    "price",
-    "cost",
-    "amount",
-    "fee",
-    "total",
-    "count",
-    "quantity",
-    "rating",
-    "score",
+/**
+ * Check if this is a core business table that might need additional indexing
+ */
+function isCoreBusinessTable(tableName: string): boolean {
+  // Skip utility/metadata tables and focus on core business entities
+  const utilityPatterns = [
+    "value_objects.",
+    "_create",
+    "_update",
+    "health_response",
+    "api_documentation",
+    "metadata",
+    "config",
+    "settings",
+    "log",
+    "audit",
+    "temp",
+    "cache",
   ];
-  return rangePatterns.some((pattern) => fieldName.toLowerCase().includes(pattern));
+
+  const isUtilityTable = utilityPatterns.some((pattern) => tableName.includes(pattern));
+
+  // Core business tables are non-utility tables that likely contain primary business data
+  return !isUtilityTable && tableName.length > 2; // Exclude very short names that might be lookup tables
+}
+
+/**
+ * Check if field is a business status/state field used for filtering
+ */
+function isBusinessStatusField(fieldName: string, propSchema: any): boolean {
+  // Status/state fields that are used in API queries
+  const statusFieldNames = ["status", "condition", "state"];
+  const isStatusField = statusFieldNames.some((pattern) =>
+    fieldName.toLowerCase().includes(pattern),
+  );
+
+  // Only create indexes for enum status fields (not free text)
+  // Enum fields have limited values and are ideal for indexing
+  return isStatusField && propSchema.enum && Array.isArray(propSchema.enum);
+}
+
+/**
+ * Check if field is searchable based on common naming patterns
+ */
+function isApiSearchableField(tableName: string, fieldName: string, propSchema: any): boolean {
+  // Only index search fields that are text and likely to be searched
+  if (propSchema.type !== "string") return false;
+
+  // Common searchable field patterns across domains
+  const searchablePatterns = [
+    "title",
+    "name",
+    "description",
+    "subject",
+    "content",
+    "label",
+    "caption",
+    "summary",
+    "text",
+  ];
+
+  const fieldLower = fieldName.toLowerCase();
+  return searchablePatterns.some((pattern) => fieldLower.includes(pattern));
+}
+
+/**
+ * Check if field is used for filtering based on common patterns
+ */
+function isApiFilterField(tableName: string, fieldName: string, propSchema: any): boolean {
+  // Common filterable field patterns
+  const filterablePatterns = [
+    "type",
+    "category",
+    "genre",
+    "method",
+    "mode",
+    "kind",
+    "class",
+    "group",
+    "level",
+    "priority",
+    "rating",
+  ];
+
+  const fieldLower = fieldName.toLowerCase();
+  const isFilterablePattern = filterablePatterns.some((pattern) => fieldLower.includes(pattern));
+
+  // Only index enum or string fields that are likely filtered
+  return isFilterablePattern && (propSchema.enum || propSchema.type === "string");
+}
+
+/**
+ * Check if field is a business date field used in queries
+ */
+function isBusinessDateField(tableName: string, fieldName: string, propSchema: any): boolean {
+  // Only index date/datetime fields
+  const isDateField =
+    propSchema.type === "string" &&
+    (propSchema.format === "date" || propSchema.format === "date-time");
+
+  if (!isDateField) return false;
+
+  // Common business date patterns that are likely to be queried
+  const businessDatePatterns = [
+    "due",
+    "start",
+    "end",
+    "created",
+    "updated",
+    "modified",
+    "published",
+    "scheduled",
+    "expires",
+    "effective",
+    "valid",
+    "birth",
+    "hire",
+    "member",
+    "joined",
+    "registered",
+  ];
+
+  const fieldLower = fieldName.toLowerCase();
+  return businessDatePatterns.some((pattern) => fieldLower.includes(pattern));
 }
 
 /**

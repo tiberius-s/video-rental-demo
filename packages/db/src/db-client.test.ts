@@ -715,7 +715,7 @@ describe("DbClient", () => {
       );
 
       assert.strictEqual(results.length, 1, "Should find one matching record");
-      assert.strictEqual(results[0].name, "test3", "Should return correct record");
+      assert.strictEqual((results[0] as any).name, "test3", "Should return correct record");
     });
   });
 

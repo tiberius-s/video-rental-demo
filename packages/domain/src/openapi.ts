@@ -1,146 +1,234 @@
 import { existsSync, readFileSync } from "fs";
-import { resolve, dirname } from "path";
+import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Path to the generated OpenAPI specification
-// When running from compiled JS in dist/, we need to go back to package root, then to tsp-output
-const openApiPath = resolve(__dirname, "../tsp-output/@typespec/openapi3/openapi.json");
-
-let cachedSpec: any = null;
-
 /**
- * Load and return the generated OpenAPI specification
- * This will be used by the API package to get the schema definitions
+ * Static class for accessing OpenAPI specification generated from TypeSpec
  */
-export function getOpenApiSpec(): any {
-  if (!cachedSpec) {
+export class OpenApiSpec {
+  private static readonly specPath = resolve(
+    __dirname,
+    "../tsp-output/@typespec/openapi3/openapi.json",
+  );
+
+  private static cachedRawSpec: string | null = null;
+
+  private static cachedParsedSpec: any = null;
+
+  /**
+   * Get the raw OpenAPI specification as JSON string
+   */
+  static getRawSpec(): string {
+    if (!this.cachedRawSpec) {
+      this.loadSpec();
+    }
+    return this.cachedRawSpec!;
+  }
+
+  /**
+   * Get the parsed OpenAPI specification as JavaScript object
+   */
+  static getParsedSpec(): any {
+    if (!this.cachedParsedSpec) {
+      this.loadSpec();
+    }
+    return this.cachedParsedSpec!;
+  }
+
+  /**
+   * Load and cache the OpenAPI specification
+   */
+  private static loadSpec(): void {
     try {
-      const specContent = readFileSync(openApiPath, "utf-8");
-      cachedSpec = JSON.parse(specContent);
+      this.cachedRawSpec = readFileSync(this.specPath, "utf-8");
+      this.cachedParsedSpec = JSON.parse(this.cachedRawSpec);
     } catch (error) {
       throw new Error(
-        `Failed to load OpenAPI specification from ${openApiPath}. ` +
+        `Failed to load OpenAPI specification from ${this.specPath}. ` +
           `Make sure to run 'npm run build:tsp' in the domain package first. ` +
           `Error: ${error}`,
       );
     }
   }
-  return cachedSpec;
-}
 
-/**
- * Cached access to OpenAPI spec
- */
-export const openApiSpec = {
-  get spec() {
-    return getOpenApiSpec();
-  },
-  getSchemas() {
-    return this.spec.components?.schemas || {};
-  },
-  getPaths() {
-    return this.spec.paths || {};
-  },
-  getComponents() {
-    return this.spec.components || {};
-  },
-};
+  /**
+   * Check if the OpenAPI specification file exists
+   */
+  static isAvailable(): boolean {
+    return existsSync(this.specPath);
+  }
 
-/**
- * Reset the cached specification (useful for testing)
- */
-export function resetCache(): void {
-  cachedSpec = null;
-}
+  /**
+   * Get the path to the OpenAPI specification file
+   */
+  static getSpecPath(): string {
+    return this.specPath;
+  }
 
-/**
- * Check if the OpenAPI specification file exists
- */
-export function isOpenApiSpecAvailable(): boolean {
-  try {
-    existsSync(openApiPath);
-    return true;
-  } catch {
-    return false;
+  /**
+   * Clear the cached specifications (useful for testing)
+   */
+  static clearCache(): void {
+    this.cachedRawSpec = null;
+    this.cachedParsedSpec = null;
   }
 }
 
 /**
- * Get the path to the OpenAPI specification file
+ * Legacy function for backward compatibility
+ * @deprecated Use OpenApiSpec.getRawSpec() or OpenApiSpec.getParsedSpec() instead
  */
+export function getOpenApiSpec(format: "json" | "js" = "json"): any {
+  return format === "js" ? OpenApiSpec.getParsedSpec() : OpenApiSpec.getRawSpec();
+}
+
+/**
+ * Helper class for accessing OpenAPI specification components
+ */
+export class OpenApiHelper {
+  /**
+   * Get schema definitions from the OpenAPI spec
+   */
+  static getSchemas(): Record<string, any> {
+    return OpenApiSpec.getParsedSpec().components?.schemas || {};
+  }
+
+  /**
+   * Get path definitions from the OpenAPI spec
+   */
+  static getPaths(): Record<string, any> {
+    return OpenApiSpec.getParsedSpec().paths || {};
+  }
+
+  /**
+   * Get components from the OpenAPI spec
+   */
+  static getComponents(): Record<string, any> {
+    return OpenApiSpec.getParsedSpec().components || {};
+  }
+
+  /**
+   * Get schema definition by name
+   */
+  static getSchemaByName(schemaName: string): any {
+    const schemas = this.getSchemas();
+    return schemas[schemaName];
+  }
+
+  /**
+   * Get all schema names
+   */
+  static getSchemaNames(): string[] {
+    const schemas = this.getSchemas();
+    return Object.keys(schemas);
+  }
+
+  /**
+   * Validate that a schema exists
+   */
+  static hasSchema(schemaName: string): boolean {
+    const schemas = this.getSchemas();
+    return schemaName in schemas;
+  }
+
+  /**
+   * Get operation definitions from paths
+   */
+  static getOperations(): Array<{
+    path: string;
+    method: string;
+    operation: any;
+  }> {
+    const paths = this.getPaths();
+    const operations: Array<{
+      path: string;
+      method: string;
+      operation: any;
+    }> = [];
+
+    for (const [path, pathItem] of Object.entries(paths)) {
+      if (typeof pathItem === "object" && pathItem !== null) {
+        for (const [method, operation] of Object.entries(pathItem)) {
+          if (typeof operation === "object" && operation !== null && method !== "parameters") {
+            operations.push({
+              path,
+              method: method.toUpperCase(),
+              operation,
+            });
+          }
+        }
+      }
+    }
+
+    return operations;
+  }
+
+  /**
+   * Get the OpenAPI specification info
+   */
+  static getApiInfo(): any {
+    return OpenApiSpec.getParsedSpec().info || {};
+  }
+
+  /**
+   * Get server definitions
+   */
+  static getServers(): any[] {
+    return OpenApiSpec.getParsedSpec().servers || [];
+  }
+}
+
+// Legacy compatibility exports
+export const openApiSpec = {
+  get spec() {
+    return OpenApiSpec.getParsedSpec();
+  },
+  getSchemas() {
+    return OpenApiHelper.getSchemas();
+  },
+  getPaths() {
+    return OpenApiHelper.getPaths();
+  },
+  getComponents() {
+    return OpenApiHelper.getComponents();
+  },
+};
+
+export function isOpenApiSpecAvailable(): boolean {
+  return OpenApiSpec.isAvailable();
+}
+
 export function getOpenApiSpecPath(): string {
-  return openApiPath;
+  return OpenApiSpec.getSpecPath();
 }
 
-/**
- * Get schema definition by name
- */
 export function getSchemaByName(schemaName: string): any {
-  const schemas = openApiSpec.getSchemas();
-  return schemas[schemaName];
+  return OpenApiHelper.getSchemaByName(schemaName);
 }
 
-/**
- * Get all schema names
- */
 export function getSchemaNames(): string[] {
-  const schemas = openApiSpec.getSchemas();
-  return Object.keys(schemas);
+  return OpenApiHelper.getSchemaNames();
 }
 
-/**
- * Validate that a schema exists
- */
 export function hasSchema(schemaName: string): boolean {
-  const schemas = openApiSpec.getSchemas();
-  return schemaName in schemas;
+  return OpenApiHelper.hasSchema(schemaName);
 }
 
-/**
- * Get operation definitions from paths
- */
 export function getOperations(): Array<{
   path: string;
   method: string;
   operation: any;
 }> {
-  const paths = openApiSpec.getPaths();
-  const operations: Array<{
-    path: string;
-    method: string;
-    operation: any;
-  }> = [];
-
-  for (const [path, pathItem] of Object.entries(paths)) {
-    if (typeof pathItem === "object" && pathItem !== null) {
-      for (const [method, operation] of Object.entries(pathItem)) {
-        if (typeof operation === "object" && operation !== null && method !== "parameters") {
-          operations.push({
-            path,
-            method: method.toUpperCase(),
-            operation,
-          });
-        }
-      }
-    }
-  }
-
-  return operations;
+  return OpenApiHelper.getOperations();
 }
 
-/**
- * Get the OpenAPI specification info
- */
 export function getApiInfo(): any {
-  return openApiSpec.spec.info || {};
+  return OpenApiHelper.getApiInfo();
 }
 
-/**
- * Get server definitions
- */
 export function getServers(): any[] {
-  return openApiSpec.spec.servers || [];
+  return OpenApiHelper.getServers();
 }

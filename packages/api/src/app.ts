@@ -1,8 +1,8 @@
+import { OpenApiSpec } from "@video-rental/domain";
 import type { Application } from "express";
 import express from "express";
 import type { Logger } from "pino";
 import { catchAllErrorsMiddleware } from "./middleware/catch-all-errors.middleware.js";
-import { getOpenApiSpec } from "@video-rental/domain";
 
 export interface AppConfig {
   logger: Logger;
@@ -48,7 +48,7 @@ export class App {
     // OpenAPI spec endpoint - demonstrates domain-first workflow
     this.#instance.get("/openapi", async (req, res) => {
       try {
-        const spec = await getOpenApiSpec();
+        const spec = OpenApiSpec.getParsedSpec();
         res.json(spec);
       } catch (error) {
         this.#logger.error(error, "Failed to load OpenAPI spec");

@@ -9,5 +9,5 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["dist", "node_modules", "tsp-output", "lib", "**/*.tsp", "**/*.test.*", "test"]
+  "exclude": ["dist", "node_modules", "tsp-output", "lib", "**/*.tsp", "test"]
 }
