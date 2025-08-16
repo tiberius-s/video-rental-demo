@@ -1,7 +1,5 @@
 {
   // TypeScript Configuration
-  "typescript.preferences.enableProjectDiagnostics": true,
-  "typescript.preferences.includeOnlyTypeScriptFiles": false,
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.suggest.autoImports": true,
   "typescript.suggest.paths": true,
@@ -20,17 +18,13 @@
 
   // File Explorer
   "files.exclude": {
-    "**/dist": true,
-    "**/node_modules": true,
     "**/*.tsbuildinfo": true,
-    "**/tsp-output": true
   },
 
   // Search Configuration
   "search.exclude": {
     "**/dist": true,
     "**/node_modules": true,
-    "**/tsp-output": true
   },
 
   // npm Configuration
