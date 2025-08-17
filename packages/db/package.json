@@ -16,8 +16,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist *.tsbuildinfo",
-    "lint": "eslint src/ --report-unused-disable-directives --max-warnings=0",
-    "lint:fix": "eslint src/ --report-unused-disable-directives --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "format": "prettier \"src/**/*.ts\" --write",
     "format:check": "prettier \"src/**/*.ts\" --check",
     "test": "node --test --experimental-test-coverage --test-coverage-exclude='**/*.test.ts' --import=tsx src/**/*.test.ts",

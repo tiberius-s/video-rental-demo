@@ -1,36 +1,28 @@
-import tseslint from "typescript-eslint";
-import neostandard from "neostandard";
 import eslintConfigPrettier from "eslint-config-prettier";
+import neostandard from "neostandard";
+import tseslint from "typescript-eslint";
 
-// Define common ignore patterns
 const commonIgnores = [
   "**/dist/**",
   "**/node_modules/**",
   "**/coverage/**",
   "**/tsp-output/**",
-  "**/*.tsp", // Ignore TypeSpec files completely
+  "**/*.tsp",
   "**/*.d.ts",
   "**/*.js.map",
   "**/*.ts.map",
-  // Ignore compiled JS files that have corresponding TS files
   "packages/**/src/**/*.js",
   "packages/**/test/**/*.js",
 ];
 
+// Keep config minimal: apply neostandard (with TS), then project-wide overrides,
+// test-specific relaxations, and finally Prettier to own formatting rules.
 export default tseslint.config(
-  // Global ignores
+  neostandard({ ts: true }),
+
+  // Project-level defaults
   {
     ignores: commonIgnores,
-  },
-
-  // Neostandard configuration with TypeScript support
-  ...neostandard({
-    ts: true,
-    ignores: commonIgnores,
-  }),
-
-  // Additional TypeScript configuration
-  {
     files: ["**/*.{ts,mts,cts}"],
     languageOptions: {
       parserOptions: {
@@ -39,7 +31,6 @@ export default tseslint.config(
       },
     },
     rules: {
-      // Essential overrides only
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/consistent-type-imports": [
         "error",
@@ -48,28 +39,16 @@ export default tseslint.config(
     },
   },
 
-  // Test files configuration
+  // Test files: be more permissive
   {
     files: ["**/*.test.{js,ts}", "**/test/**/*.{js,ts}", "**/__tests__/**/*.{js,ts}"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-floating-promises": "off", // Tests often don't need to await promises
-      "@typescript-eslint/require-await": "off",
       "no-console": "off",
     },
   },
 
-  // Configuration files
-  {
-    files: ["**/*.config.{js,ts}", "**/.*rc.{js,ts}"],
-    rules: {
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "no-console": "off",
-    },
-  },
-
-  // Prettier configuration (should be last)
+  // Keep Prettier last so it can turn off stylistic ESLint rules
   eslintConfigPrettier,
 );
