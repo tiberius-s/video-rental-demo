@@ -13,6 +13,7 @@ import "./models/value-objects/money.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
+using VideoRental.Domain.ValueObjects;
 
 @service(#{
   title: "Video Rental Store API"
@@ -57,9 +58,6 @@ using TypeSpec.OpenAPI;
   }
 )
 namespace VideoRental.Domain;
-
-using VideoRental.Domain;
-using VideoRental.Domain.ValueObjects;
 
 // Health check
 @route("/health")
@@ -134,14 +132,7 @@ namespace Videos {
   @summary("Check video availability")
   op checkAvailability(@path videoId: string): {
     @statusCode statusCode: 200;
-    @body body: {
-      @doc("Whether copies are available")
-      available: boolean;
-      @doc("Number of available copies")
-      availableCopies: int32;
-      @doc("Total copies owned")
-      totalCopies: int32;
-    };
+    @body body: VideoAvailability;
   } | NotFoundResponse;
 
   @delete
@@ -187,18 +178,7 @@ namespace Customers {
   @doc("Verify customer can rent (no overdue items, account in good standing)")
   op checkEligibility(@path customerId: string): {
     @statusCode statusCode: 200;
-    @body body: {
-      @doc("Can customer rent new videos")
-      eligible: boolean;
-      @doc("Reason if not eligible")
-      reason?: string;
-      @doc("Number of active rentals")
-      activeRentals: int32;
-      @doc("Number of overdue rentals")
-      overdueRentals: int32;
-      @doc("Outstanding fees")
-      outstandingFees: Money;
-    };
+    @body body: CustomerEligibility;
   } | NotFoundResponse;
 
   @get
@@ -243,24 +223,10 @@ namespace Rentals {
   @summary("Create new rental")
   @doc("Process video rental with eligibility checks and pricing")
   op create(
-    @body request: {
-      @doc("Customer renting the video")
-      customerId: string;
-      @doc("Video to rent")
-      videoId: string;
-      @doc("Rental duration")
-      duration: StandardRentalDuration;
-    }
+  @body request: RentalCreateRequest
   ): {
-    @statusCode statusCode: 201;
-    @body body: {
-      @doc("Created rental")
-      rental: Rental;
-      @doc("Payment due")
-      payment: Payment;
-      @doc("Due date")
-      dueDate: string;
-    };
+  @statusCode statusCode: 201;
+  @body body: RentalCreateResponse;
   } | BadRequestResponse | ConflictResponse;
 
   @get
@@ -278,27 +244,10 @@ namespace Rentals {
   @doc("Process return, calculate late fees if applicable")
   op returnVideo(
     @path rentalId: string,
-    @body returnInfo: {
-      @doc("Return date/time")
-      @format("date-time")
-      returnDate: string;
-      @doc("Condition of returned copy")
-      condition?: CopyCondition;
-      @doc("Return notes")
-      notes?: string;
-    }
+  @body returnInfo: RentalReturnRequest
   ): {
-    @statusCode statusCode: 200;
-    @body body: {
-      @doc("Updated rental")
-      rental: Rental;
-      @doc("Late fees (if any)")
-      lateFees?: Money;
-      @doc("Additional payment required")
-      additionalPayment?: Payment;
-      @doc("Return was on time")
-      onTime: boolean;
-    };
+  @statusCode statusCode: 200;
+  @body body: RentalReturnResponse;
   } | NotFoundResponse | ConflictResponse;
 
   @get
@@ -307,13 +256,8 @@ namespace Rentals {
   @summary("List overdue rentals")
   @doc("Get rentals past due date for follow-up")
   op getOverdue(...PaginationParams): {
-    @statusCode statusCode: 200;
-    @body body: {
-      @doc("Overdue rentals")
-      rentals: PaginatedResponse<Rental>;
-      @doc("Total late fees outstanding")
-      totalLateFees: Money;
-    };
+  @statusCode statusCode: 200;
+  @body body: OverdueRentalsResponse;
   } | UnauthorizedResponse;
 
   @delete
@@ -354,15 +298,8 @@ namespace Payments {
     @path customerId: string,
     ...PaginationParams
   ): {
-    @statusCode statusCode: 200;
-    @body body: {
-      @doc("Customer payments")
-      payments: PaginatedResponse<Payment>;
-      @doc("Total paid")
-      totalPaid: Money;
-      @doc("Outstanding balance")
-      outstandingBalance: Money;
-    };
+  @statusCode statusCode: 200;
+  @body body: CustomerPaymentsResponse;
   } | NotFoundResponse;
 }
 
@@ -384,17 +321,8 @@ namespace InventoryManagement {
   @summary("Get video inventory")
   @doc("Get all copies for a specific video")
   op getByVideo(@path videoId: string): {
-    @statusCode statusCode: 200;
-    @body body: {
-      @doc("Video information")
-      video: Video;
-      @doc("Physical copies")
-      copies: Inventory[];
-      @doc("Available count")
-      availableCount: int32;
-      @doc("Total count")
-      totalCount: int32;
-    };
+  @statusCode statusCode: 200;
+  @body body: VideoInventoryResponse;
   } | NotFoundResponse;
 
   @patch(#{implicitOptionality: true})

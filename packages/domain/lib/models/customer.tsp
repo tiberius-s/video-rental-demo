@@ -50,3 +50,21 @@ enum CustomerStatus {
   @doc("Inactive customer")
   Inactive,
 }
+
+@doc("Customer eligibility summary for rentals")
+model CustomerEligibility {
+  @doc("Can customer rent new videos")
+  eligible: boolean;
+
+  @doc("Reason if not eligible")
+  reason?: string;
+
+  @doc("Number of active rentals")
+  activeRentals: int32;
+
+  @doc("Number of overdue rentals")
+  overdueRentals: int32;
+
+  @doc("Outstanding fees")
+  outstandingFees: Money;
+}

@@ -49,3 +49,18 @@ enum CopyStatus {
   @doc("Removed from circulation")
   Retired,
 }
+
+@doc("Response for video inventory lookup")
+model VideoInventoryResponse {
+  @doc("Video information")
+  video: Video;
+
+  @doc("Physical copies")
+  copies: Inventory[];
+
+  @doc("Available count")
+  availableCount: int32;
+
+  @doc("Total count")
+  totalCount: int32;
+}

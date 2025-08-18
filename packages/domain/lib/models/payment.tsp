@@ -88,3 +88,15 @@ enum PaymentStatus {
   @doc("Payment was cancelled")
   Cancelled,
 }
+
+@doc("Response containing customer payments and summary")
+model CustomerPaymentsResponse {
+  @doc("Customer payments")
+  payments: PaginatedResponse<Payment>;
+
+  @doc("Total paid")
+  totalPaid: Money;
+
+  @doc("Outstanding balance")
+  outstandingBalance: Money;
+}

@@ -38,3 +38,15 @@ model Video {
   @doc("Total number of copies owned")
   totalCopies: int32;
 }
+
+@doc("Availability summary for a video")
+model VideoAvailability {
+  @doc("Whether copies are available")
+  available: boolean;
+
+  @doc("Number of available copies")
+  availableCopies: int32;
+
+  @doc("Total copies owned")
+  totalCopies: int32;
+}
